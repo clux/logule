@@ -23,8 +23,8 @@ Everything will be aligned automatically.
 Simply pass in more strings to get more namespaces prefixed.
 
 ````javascript
-var log = new Logger('CONNECTION', 'ESTABLISHMENT');
-log.info('Accepted 192.168.0.160');
+var log = new Logger('BUILD', 'COMPILE');
+log.debug('Coffee app.coffee');
 ````
 
 ### Namespace Padding
@@ -51,7 +51,7 @@ Therefore, it is possible to make a Logger 'subclass' using `sub()`.
 var log = new logule('BUILD');
 var sublog = log.sub('COMPILE');
 // pass sublog to the compilation sub-module
-// use log in the hierarchy above
+// use log in the build hierarchy above compile
 ````
 
 If the same namespace is fine for another module to use, simply pass log to it.
@@ -62,7 +62,7 @@ This will return the correctly closure bound log method and pass that down.
 
 ````javascript
 var debug = log.get('debug');
-debug("this goes to log.debug - no other methods accessible through this var");
+debug("same as log.debug - no other methods accessible through this var");
 ````
 
 Alternatively, make a copy of the log instance by filtering out the methods you do not want to allow:
