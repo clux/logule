@@ -56,7 +56,7 @@ We can now pass sublog down one level in th hierarchy.
 If the same namespace is fine for another module to use, it suffices to pass the same instance down.
 
 #### NB: Subclass Padding
-`log.sub()` maintains padding if set.
+`log.sub()` maintains padding if set on log.
 
 ### Filtering log
 If you only want a submodule to be able to log debugs for instance, you can save typing and force this behaviour by calling `get` on log.
