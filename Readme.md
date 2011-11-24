@@ -20,7 +20,7 @@ If Logger is instantiated with no constructor arguments, then the output will si
 Everything will be aligned automatically.
 
 ### Multiple Namespaces
-Simply pass in more strings to get more namespaces prefixed. The last argument to Logger is always the padding size (which is the same for each namespace level).
+Simply pass in more strings to get more namespaces prefixed.
 
 ````javascript
 var log = new Logger('CONNECTION', 'ESTABLISHMENT');
