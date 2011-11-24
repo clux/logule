@@ -2,6 +2,9 @@
 Logule is an advanced logging utility for nodejs. It is analogous to `console.log` and can take multiple arguments,
 but additionally it prefixes the current time, the log level, and optionally, a caller prefix.
 
+Shortcut methods for the log levels are available as `log.error`, `log.warn`, `log.info` and `log.debug`.
+These methods are additionally chainable.
+
 ## Usage
 Here's with a prefix:
 
@@ -31,7 +34,7 @@ Everything will be aligned automatically.
 ## Passing log around
 To give submodules full control over what to send to the logger, simply pass down the log variable to them.
 
-If, however, you only want a submodule to be able to log debugs for instance, you can make a sanitized logger function for them without access to .error, .warn and .info.
+If, however, you only want a submodule to be able to log debugs for instance, you can make a sanitized logger function for them without access to `.error`, `.warn` and `.info`.
 
 ````javascript
 var debug = function(){
