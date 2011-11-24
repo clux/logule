@@ -34,7 +34,7 @@ pad = (str, len) ->
 # Public API
 
 # Logger Class
-Logger = (@prefix, @size = 10) ->
+Logger = (@prefix, @size = 2) ->
 
 # Log method
 Logger::log = (type) ->
@@ -63,14 +63,18 @@ module.exports = Logger
 
 # Quick test
 if module is require.main
-  size = 10
-  log = new Logger('logger', size)
-  log.error('this is very bad').warn('this could be bad').info('standard message').debug('irrelephant message')
-  log = new Logger('deathmatch', size)
-  log.error('this is very bad').warn('this could be bad').info('standard message').debug('irrelephant message')
-  d = -> log.debug.apply(log, arguments)
-  d("arst")
+  log = new Logger('prefix')
+  log.error("this is an error message")
+  log.warn("warning").info("info msg").debug("chained debug")
 
-  log = new Logger()
-  log.error('this is very bad').warn('this could be bad').info('standard message').debug('irrelephant message')
+
+  #size = 10
+  #log = new Logger('logger', size)
+  #log.error('this is very bad').warn('this could be bad').info('standard message').debug('irrelephant message')
+  #log = new Logger('deathmatch', size)
+  #log.error('this is very bad').warn('this could be bad').info('standard message').debug('irrelephant message')
+  #d = -> log.debug.apply(log, arguments)
+  #d("arst")
+  #log = new Logger()
+  #log.error('this is very bad').warn('this could be bad').info('standard message').debug('irrelephant message')
 
