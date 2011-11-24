@@ -6,7 +6,7 @@ var log new Logger('prefix');
 log.error("this is an error message");
 log.warn("warning").info("info msg").debug("chained debug");
 ````
-![output!](http://github.com/clux/logule/output.png)
+![output!](https://github.com/clux/logule/raw/master/output.png)
 ### Padding
 Padding of the prefix level can be done by setting the second parameter in the constructor to the indentation level you want.
 
