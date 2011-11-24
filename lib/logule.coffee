@@ -24,13 +24,23 @@ max_lvl = Math.max.apply({}, levels.map((l) -> l.length))
 pad = (str, len) ->
   if str.length < len then str + new Array(len - str.length + 1).join(' ') else str
 
+# Constructor helper
+construct = (Ctor, args) ->
+  F = -> Ctor.apply(@, args)
+  F:: = Ctor::
+  new F()
+
 # Logger Class
 Logger = (@namespaces...) ->
 
 # Set Padding Size
 Logger::pad = (@size = 0) -> @
 
-# Log method
+# Subclass from a pre-configured Logger class to get an extra namespace
+Logger::sub = (subns...) ->
+  construct(Logger, @namespaces.concat(subns)).pad(@size)
+
+# Log base method
 Logger::log = (lvl) ->
   delim = levelMaps[lvl]('-')
   level = pad(lvl, max_lvl).toUpperCase()
@@ -50,14 +60,18 @@ Logger::log = (lvl) ->
   ].concat(end, toArray(arguments)[1...])
   @
 
+# Returns a sanitized Logger instance hiding outputs to disallowed fns
 Logger::remove = (disallowed...) ->
-  disallowed.forEach (fnstr) =>
-    @[fnstr] = ->
-  @
+  #TODO: make sure log is not in disallowed
+  l = construct(Logger, @namespaces).pad(@size)
+  disallowed.forEach (fnstr) ->
+    l[fnstr] = -> l
+  l
 
+# Return a single Logger helper method
 Logger::get = (fnstr) ->
-  =>
-    @[fnstr].apply(@, arguments)
+  #TODO: make sure fnstr is legal
+  => @[fnstr].apply(@, arguments)
 
 # Generate one shortcut method per level
 levels.forEach (name) ->
@@ -69,10 +83,15 @@ module.exports = Logger
 
 # Quick test
 if module is require.main
-  size = 0
+  size = 15
   log = new Logger('EVENTS', 'CONNECTION').pad(size)
+  log.remove('warn','error').info('wee').warn('should not work').debug('should work') # returned clone ignores warning messages
   log.error('this is very bad').warn('this could be bad').info('standard message').debug('irrelephant message')
   log = new Logger('CONNECTION').pad(size)
+  sublog = log.sub('ESTABLISHMENT', 'FINALIZING')
+  sublog.warn('works?')
+
+
   zalgo = log.get('zalgo')
   zalgo("zalgotest!", 23432, 234)
 

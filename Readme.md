@@ -43,13 +43,34 @@ Note that namespace padding with multiple namespaces is almost impossible to get
 If you do enforce superstrict rules, however, the `pad` method will set the pad size for each namespace.
 
 ## Passing log around
-To give submodules full control over what to send to the logger, simply pass down the log variable to them - or make a new one with a more specifix namespace therein.
+If using multiple namespaces, then having to write them all out in every module when changing the last is not optimal.
 
-If, however, you only want a submodule to be able to log debugs for instance, you can `get` the correctly closure bound debug method and pass that down:
+Therefore, it is possible to make a Logger 'subclass' using `sub()`.
+
+````javascript
+var log = new logule('BUILD');
+var sublog = log.sub('COMPILE');
+// pass sublog to the compilation sub-module
+// use log in the hierarchy above
+````
+
+If the same namespace is fine for another module to use, simply pass log to it.
+
+### Filtering log
+If you only want a submodule to be able to log debugs for instance, you can save typing and force this behaviour by calling `get` on log.
+This will return the correctly closure bound log method and pass that down.
 
 ````javascript
 var debug = log.get('debug');
-debug("this goes to log.debug - no other methods accessible through this");
+debug("this goes to log.debug - no other methods accessible through this var");
+````
+
+Alternatively, make a copy of the log instance by filtering out the methods you do not want to allow:
+
+````javascript
+var sublog = log.remove('debug', 'info');
+sublog.warn('works').info('suppressed').error('works!');
+log.info('works');
 ````
 
 ## Zalgo
