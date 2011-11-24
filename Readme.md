@@ -40,7 +40,7 @@ If the prefix is longer than the size limit, it will stand out from the crowd.
 This is useful when different Logger instances is created in different places with different prefixes, and you want to line up the output.
 
 Note that namespace padding with multiple namespaces is almost impossible to get right (all namespaces pad to an equal length).
-So unless you enforce superstrict rules, you might just want to drop this functionality in this use case.
+If you do enforce superstrict rules, however, the `pad` method will set the pad size for each namespace.
 
 ## Passing log around
 To give submodules full control over what to send to the logger, simply pass down the log variable to them - or make a new one with a more specifix namespace therein.
