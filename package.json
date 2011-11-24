@@ -9,7 +9,7 @@
   },
   "main": "index.js",
   "engines": {
-    "node": "~0.4.12"
+    "node": ">=0.4.10"
   },
   "dependencies": {
     "coffee-script": "~1.1.3",
