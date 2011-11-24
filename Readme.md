@@ -42,6 +42,13 @@ var debug = function(){
 };
 ````
 
+## Zalgo
+̺̑ he comes
+
+````javascript
+log.zalgo("no");
+````
+
 ## Installation
 
 ````bash
