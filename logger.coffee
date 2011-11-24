@@ -8,73 +8,55 @@ toArray = (enu) ->
   e for e in enu
 
 # Log levels
-levels = [
-  'error'
-  'warn'
-  'info'
-  'debug'
-]
+levelMaps =
+  'error' : c.red
+  'warn'  : c.yellow
+  'info'  : c.green
+  'debug' : c.cyan
 
-# Colors for log levels
-colors = [
-  c.red
-  c.yellow
-  c.green
-  c.cyan
-]
+levels = Object.keys(levelMaps)
 
-# Count from levels
-max = Math.max.apply({}, levels.map((l) -> l.length))
-num = levels.length
+# Max level length
+max_lvl = Math.max.apply({}, levels.map((l) -> l.length))
 
-# Pads the nice output to the longest log level
+# Pads str to a str of length len
 pad = (str, len) ->
   if str.length < len then str + new Array(len - str.length + 1).join(' ') else str
 
-# Public API
-
 # Logger Class
-Logger = (@prefix, @size = 2) ->
+Logger = (@prefix, @size = 0) ->
 
 # Log method
-Logger::log = (type) ->
-  index = levels.indexOf(type)
-  return @ if index >= num
-  type = pad(type, max).toUpperCase()
-
-  @delim = colors[index]('-')
+Logger::log = (lvl) ->
+  @delim = levelMaps[lvl]('-')
+  level = pad(lvl, max_lvl).toUpperCase()
   end = if @prefix then [c.blue(c.bold(pad(@prefix, @size))), @delim] else []
-  #console.log @size, @prefix.length, @prefix
 
   console.log.apply console, [
     c.grey new Date().toLocaleTimeString()
     @delim
-    if type is 'error' then c.bold type else type
+    if lvl is 'error' then c.bold level else level
     @delim
   ].concat(end).concat(toArray(arguments)[1...])
   @
 
-# Generate methods
+# Generate one shortcut method per level
 levels.forEach (name) ->
   Logger::[name] = ->
     @log.apply(@, [name].concat(toArray(arguments)))
 
+# Expose Logger
 module.exports = Logger
 
 # Quick test
 if module is require.main
-  log = new Logger('prefix')
-  log.error("this is an error message")
-  log.warn("warning").info("info msg").debug("chained debug")
-
-
-  #size = 10
-  #log = new Logger('logger', size)
-  #log.error('this is very bad').warn('this could be bad').info('standard message').debug('irrelephant message')
-  #log = new Logger('deathmatch', size)
-  #log.error('this is very bad').warn('this could be bad').info('standard message').debug('irrelephant message')
-  #d = -> log.debug.apply(log, arguments)
-  #d("arst")
-  #log = new Logger()
-  #log.error('this is very bad').warn('this could be bad').info('standard message').debug('irrelephant message')
+  size = 10
+  log = new Logger('logger', size)
+  log.error('this is very bad').warn('this could be bad').info('standard message').debug('irrelephant message')
+  log = new Logger('deathmatch', size)
+  log.error('this is very bad').warn('this could be bad').info('standard message').debug('irrelephant message')
+  d = -> log.debug.apply(log, arguments)
+  d("arst", {}, 324324, new Date())
+  log = new Logger()
+  log.error('this is very bad').warn('this could be bad').info('standard message').debug('irrelephant message')
 
