@@ -48,13 +48,15 @@ If using multiple namespaces, then having to write them all out in every module 
 Therefore, it is possible to make a Logger 'subclass' using `sub()`.
 
 ````javascript
-var log = new logule('BUILD');
-var sublog = log.sub('COMPILE');
-// pass sublog to the compilation sub-module
-// use log in the build hierarchy above compile
+var log = new Logger('BUILD');
+var sublog = log.sub('COMPILE'); // same as new Logger('BUILD', 'COMPILE')
 ````
 
-If the same namespace is fine for another module to use, simply pass log to it.
+We can now pass sublog down one level in th hierarchy.
+If the same namespace is fine for another module to use, it suffices to pass the same instance down.
+
+#### NB: Subclass Padding
+`log.sub()` maintains padding if set.
 
 ### Filtering log
 If you only want a submodule to be able to log debugs for instance, you can save typing and force this behaviour by calling `get` on log.
