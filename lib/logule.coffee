@@ -25,21 +25,39 @@ pad = (str, len) ->
   if str.length < len then str + new Array(len - str.length + 1).join(' ') else str
 
 # Logger Class
-Logger = (@prefix, @size = 0) ->
+Logger = (@namespaces...) ->
+
+# Set Padding Size
+Logger::pad = (@size = 0) -> @
 
 # Log method
 Logger::log = (lvl) ->
-  @delim = levelMaps[lvl]('-')
+  delim = levelMaps[lvl]('-')
   level = pad(lvl, max_lvl).toUpperCase()
-  end = if @prefix then [c.blue(c.bold(pad(@prefix, @size))), @delim] else []
+
+  end = @namespaces.reduce((acc, ns) ->
+    acc.concat [
+      c.blue c.bold pad(ns+'', @size)
+      delim
+    ]
+  , [])
 
   console.log.apply console, [
     c.grey new Date().toLocaleTimeString()
-    @delim
+    delim
     if lvl is 'error' then c.bold level else level
-    @delim
+    delim
   ].concat(end, toArray(arguments)[1...])
   @
+
+Logger::remove = (disallowed...) ->
+  disallowed.forEach (fnstr) =>
+    @[fnstr] = ->
+  @
+
+Logger::get = (fnstr) ->
+  =>
+    @[fnstr].apply(@, arguments)
 
 # Generate one shortcut method per level
 levels.forEach (name) ->
@@ -51,12 +69,14 @@ module.exports = Logger
 
 # Quick test
 if module is require.main
-  size = 10
-  log = new Logger('logger', size)
+  size = 0
+  log = new Logger('EVENTS', 'CONNECTION').pad(size)
   log.error('this is very bad').warn('this could be bad').info('standard message').debug('irrelephant message')
-  log = new Logger('deathmatch', size)
-  dbg = -> log.debug.apply(log, arguments)
-  dbg("arst", {}, 324324, new Date())
+  log = new Logger('CONNECTION').pad(size)
+  zalgo = log.get('zalgo')
+  zalgo("zalgotest!", 23432, 234)
+
   log = new Logger()
   log.error('this is very bad').warn('this could be bad').zalgo('he comes').info('try xhtml')
+
 
