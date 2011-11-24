@@ -13,6 +13,7 @@ levelMaps =
   'warn'  : c.yellow
   'info'  : c.green
   'debug' : c.cyan
+  'zalgo' : c.zalgo
 
 levels = Object.keys(levelMaps)
 
@@ -37,7 +38,7 @@ Logger::log = (lvl) ->
     @delim
     if lvl is 'error' then c.bold level else level
     @delim
-  ].concat(end).concat(toArray(arguments)[1...])
+  ].concat(end, toArray(arguments)[1...])
   @
 
 # Generate one shortcut method per level
@@ -54,9 +55,8 @@ if module is require.main
   log = new Logger('logger', size)
   log.error('this is very bad').warn('this could be bad').info('standard message').debug('irrelephant message')
   log = new Logger('deathmatch', size)
-  log.error('this is very bad').warn('this could be bad').info('standard message').debug('irrelephant message')
-  d = -> log.debug.apply(log, arguments)
-  d("arst", {}, 324324, new Date())
+  dbg = -> log.debug.apply(log, arguments)
+  dbg("arst", {}, 324324, new Date())
   log = new Logger()
-  log.error('this is very bad').warn('this could be bad').info('standard message').debug('irrelephant message')
+  log.error('this is very bad').warn('this could be bad').zalgo('he comes').info('try xhtml')
 

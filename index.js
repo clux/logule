@@ -1,3 +1,3 @@
 require('coffee-script');
 
-module.exports = require('./lib/logger');
+module.exports = require('./lib/logule');
