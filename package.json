@@ -2,7 +2,7 @@
   "author": "Eirik Albrigtsen <analsandblaster@gmail.com>",
   "name": "logule",
   "description": "An advanced logger for nodejs",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "repository": {
     "type": "git",
     "url": "git://github.com/clux/logule.git"
@@ -12,7 +12,7 @@
     "node": "~0.4.12"
   },
   "dependencies": {
-    "colors": {"~0.5.1"}
+    "colors": "~0.5.1"
   },
   "devDependencies": {}
 }
