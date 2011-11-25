@@ -1,11 +1,4 @@
-# Logger
-# Adapted from socket.io-node's logger
 c = require('colors')
-
-
-# arguments helper
-toArray = (enu) ->
-  e for e in enu
 
 # Log levels
 levelMaps =
@@ -13,6 +6,7 @@ levelMaps =
   'warn'  : c.yellow
   'info'  : c.green
   'debug' : c.cyan
+  'trace' : c.grey
   'zalgo' : c.zalgo
 
 levels = Object.keys(levelMaps)
@@ -31,52 +25,87 @@ construct = (Ctor, args) ->
   new F()
 
 # Logger Class
-Logger = (@namespaces...) ->
+Logger = (namespaces...) ->
+  size = 0
+  removed = []
+  that = @
 
-# Set Padding Size
-Logger::pad = (@size = 0) -> @
 
-# Subclass from a pre-configured Logger class to get an extra namespace
-Logger::sub = (subns...) ->
-  construct(Logger, @namespaces.concat(subns)).pad(@size)
+  # Privileged methods
 
-# Log base method
-Logger::log = (lvl) ->
-  delim = levelMaps[lvl]('-')
-  level = pad(lvl, max_lvl).toUpperCase()
 
-  end = @namespaces.reduce((acc, ns) ->
-    acc.concat [
-      c.blue c.bold pad(ns+'', @size)
+  # Internal error logger
+  # returns a new Logger with same namespaces+1, but ignores current filters
+  internal = ->
+    construct(Logger, namespaces.concat(['logule'])).pad(size)
+
+  # Log base method
+  # chains if it was not obtained via @get
+  log = (lvl, single, args...) ->
+    delim = levelMaps[lvl]('-')
+    level = pad(lvl, max_lvl).toUpperCase()
+
+    end = namespaces.reduce((acc, ns) ->
+      acc.concat [
+        c.blue c.bold pad(ns+'', size)
+        delim
+      ]
+    , [])
+
+    console.log.apply console, [
+      c.grey new Date().toLocaleTimeString()
       delim
-    ]
-  , [])
+      if lvl is 'error' then c.bold level else level
+      delim
+    ].concat(end, args)
+    return if single
+    that
 
-  console.log.apply console, [
-    c.grey new Date().toLocaleTimeString()
-    delim
-    if lvl is 'error' then c.bold level else level
-    delim
-  ].concat(end, toArray(arguments)[1...])
-  @
 
-# Returns a sanitized Logger instance hiding outputs to disallowed fns
-Logger::remove = (disallowed...) ->
-  #TODO: make sure log is not in disallowed
-  l = construct(Logger, @namespaces).pad(@size)
-  disallowed.forEach (fnstr) ->
-    l[fnstr] = -> l
-  l
+  # Public methods
 
-# Return a single Logger helper method
-Logger::get = (fnstr) ->
-  #TODO: make sure fnstr is legal
-  => @[fnstr].apply(@, arguments)
 
-# Generate one shortcut method per level
-levels.forEach (name) ->
-  Logger::[name] = ->
-    @log.apply(@, [name].concat(toArray(arguments)))
+  # Set the padding size
+  @pad = (s) ->
+    size = s
+    that
+
+  # Suppress - sanitizes this Logger instance hiding outputs to disallowed fns
+  # Method is cumulative across subs
+  @suppress = (fns...) ->
+    fns.forEach (fn) ->
+      if levels.indexOf(fn) < 0
+        internal().warn("Invalid function requested to be suppressed - \"#{fn}\" not a valid logger method")
+      else
+        that[fn] = -> that
+
+    removed = removed.concat(fns).filter (e, i, ary) ->
+      ary.indexOf(e, i+1) < 0 # removed should remain unique at all times
+
+    that
+
+  # Subclass from a pre-configured Logger class to get an extra namespace
+  @sub = (subns...) ->
+    construct(Logger, namespaces.concat(subns)).pad(size).suppress.apply({}, removed)
+
+  # Return a single Logger helper method
+  @get = (fn) ->
+    idx = levels.indexOf(fn)
+    return (->) if removed.indexOf(fn) >= 0 # dont allow get to resurrect suppressed fns
+
+    if idx < 0
+      internal().error("Invalid function requested to Logule::get - \"#{fn}\" not a valid logger method")
+      return (->)
+    l = that.sub()
+    l.suppress.apply({}, levels) # suppress all
+    (args...) -> log.apply(l, [fn, true].concat(args))
+
+  # Generate one shortcut method per level
+  levels.forEach (name) ->
+    that[name] = (args...) ->
+      log.apply(that, [name, false].concat(args))
+
+  return
 
 # Expose Logger
 module.exports = Logger
@@ -85,17 +114,19 @@ module.exports = Logger
 if module is require.main
   size = 15
   log = new Logger('EVENTS', 'CONNECTION').pad(size)
-  log.remove('warn','error').info('wee').warn('should not work').debug('should work') # returned clone ignores warning messages
-  log.error('this is very bad').warn('this could be bad').info('standard message').debug('irrelephant message')
+  log.suppress('warn','error').warn('should not work').debug('but log chains')
+
   log = new Logger('CONNECTION').pad(size)
-  sublog = log.sub('ESTABLISHMENT', 'FINALIZING')
-  sublog.warn('works?')
+  sublog = log.sub('ESTABLISHMENT')
+  sublog.warn('works')
+  log.suppress('warn')
+  log.warn('wont work1')
+  log = log.sub('REMOVAL')
+  log.warn('wont work2').trace('tracer test')
 
 
   zalgo = log.get('zalgo')
-  zalgo("zalgotest!", 23432, 234)
+  zalgo("zalgo", 23432, 234)
 
   log = new Logger()
-  log.error('this is very bad').warn('this could be bad').zalgo('he comes').info('try xhtml')
-
-
+  log.error('this is very bad').zalgo('he comes').info('try xhtml')

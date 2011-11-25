@@ -1,4 +1,11 @@
-0.2.0 / 2011-11-25
+0.3.0 / 2011-11-25
+==================
+  * The `remove` method is now known as `suppress`
+  * The `get` method result no longer allows chaining into different log methods (bug)
+  * Bad fns requested to `suppress` and `get` will result in an internal log in such a way that you can determine quickly what you did wrong
+  * Everything is properly encapsulated so that you can not break out of `suppress` and `get`calls
+
+0.2.0 / 2011-11-24
 ==================
   * Multiple namespaces can be passed to constructor
   * Padding option now set via the `pad` method
