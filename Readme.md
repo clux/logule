@@ -77,7 +77,7 @@ debug("same as log.debug - no other methods accessible through this var");
 ````
 
 Note that if the instance have called `.suppress('debug')` earlier - or it is a `.sub()` of an instance that have called `.suppress('debug')`,
-you would still get a working function from `.get('debug')`. It would simply not do anything.
+you would still get a working function from `.get('debug')`. Its output, would on the other hand, be suppressed.
 
 ### Global Log Levels
 By only using `.sub()` instances inheriting from a single base instance, you can implement global log levels at compile time by calling `.suppress()`

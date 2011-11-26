@@ -26,7 +26,7 @@ construct = (Ctor, args) ->
 
 # Logger Class
 Logger = (namespaces...) ->
-  # TODO.ES6 used named properties instead of this mess perhaps
+  # TODO.ES6 use named properties instead of this mess perhaps
   size = 0
   removed = []
   that = @
