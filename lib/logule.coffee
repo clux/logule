@@ -26,7 +26,7 @@ construct = (Ctor, args) ->
 
 # Logger Class
 Logger = (namespaces...) ->
-  # TODO.ES6? use named properties for these so that everything in constructor style can be avoided
+  # TODO.ES6? use name objects for these 3 so that everything in constructor style can be avoided
   size = 0
   removed = []
   that = @

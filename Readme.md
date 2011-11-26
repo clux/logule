@@ -91,7 +91,7 @@ var log = new Logger('APP');
 **/
 var modelsLog = log.sub('MODEL');
 var eventsLog = log.sub('EVENT');
-//pass the two log files down
+//pass the two log instances down
 ````
 
 ## Zalgo
