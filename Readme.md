@@ -9,22 +9,23 @@ These methods are additionally chainable.
 Basic usage:
 
 ````javascript
-var log = require('logule');
-log.error("this is an error message");
-log.warn("warning").info("info msg").debug("chained debug");
+var logule = require('logule');
+logule
+  .error("this is an error message")
+  .warn("warning")
+  .info("info msg")
+  .debug("chained debug");
 ````
 
 ![simple output!](https://github.com/clux/logule/raw/master/outputsimple.png)
 
 ## Namespaces
-With a single namespace
+To add a namespace prefix, subclass logule and pass it in
 
 ````javascript
-log.sub('prefix')
-  .error("this is an error message")
-  .warn("warning")
-  .info("info msg")
-  .debug("chained debug");
+log = logule.sub('prefix')
+log.error("this is an error message")
+log.warn("warning").info("info msg").debug("chained debug");
 ````
 
 ![one namespace output!](https://github.com/clux/logule/raw/master/output.png)
@@ -34,14 +35,16 @@ Pass in more strings to get more namespaces prefixed
 
 ````javascript
 var log = logule.sub('BUILD', 'COMPILE');
-log.debug('Coffee app.coffee');
+log.debug('log has two prefixes');
+logule.info("ancestor remains basic")
 ````
 
 ### Namespace Padding
 Call `.pad(size)` on a logger instance to specify a fixed indentation level for the namespaces.
 
 ````javascript
-var log = logule.sub('BUILD').pad(16);
+log.pad(16);
+log.warn('my namespaces are padded')
 ````
 
 Messages will here begin 16 + delimiter size characters away from how it would log without a namespace.
@@ -49,45 +52,45 @@ Large namespaces (>specified size), will stand out from the crowd.
 
 This allows you to line up the output from multiple logger instances.
 
-For multiple namespaces, the size applies to each (present) level. Padding will, in other words, only work with strict naming conventions.
+For multiple namespaces, the size applies to each namespace. Padding will, in other words, only look good with strict naming conventions.
 
 ## Passing log around
 ### Subclasses
-Easiest with multiple namespaces; call `.sub()` and old namespaces will be preserved.
+More advanced use of `.sub()` involve inheriting based on namespaces:
 
 ````javascript
 var log = logule.sub('BUILD');
-var sublog = log.sub('COMPILE'); // same as logule.sub('BUILD', 'COMPILE')
+var sublog = log.sub('COMPILE');
 ````
 
-A call to `.sub()` without arguments will simply maintain existing namespace(s).
+`sublog` here could also be constructed with `logule.sub('BUILD', 'COMPILE')`,
+but this would lose the link between `log` and `sublog`.
 
-This is better than creating brand new ones, because you can filter away certain log messages by simply filtering on the base logger at compile time.
+If the link is maintained via 'one sub at a time' style passing around, then it is easy to filter log output from large chunks of code at a time.
 
-Essentially: **Sub is a new Clone**:
-`log.sub()` maintains all padding, suppress and namespace properties set on the original log.
+**`.sub()` is a new clone**:
+`log.sub()` maintains all padding, suppressed log levels and namespace properties set on the original `log` instance.
 
 ### Filtering log
 #### Standard Way
 Suppressing logs from an instance is done in a very neat, propagating, and non-breaking way.
-`.suppress(methods...)` returns a `sub()` suppresses output from specified methods, but still allows them to be called, and they still chain.
+`.suppress(methods...)` suppresses output from specified methods, but still allows them to be called, and they still chain.
 
 ````javascript
-var sublog = log.suppress('debug', 'info');
-sublog.warn('works').info('suppressed').error('works!');
-log.info('works');
+log.suppress('debug', 'info');
+log.warn('works').info('suppressed').error('works').debug('suppressed');
 ````
 
 #### Simple Function way
 A debug module will only need `log.debug`. You can `.get('debug')` on an instance to return the correctly bound instance method to pass down.
 
 ````javascript
-var debug = log.get('debug');
-debug("same as log.debug - no other methods accessible through this var");
+var dbg = log.get('debug');
+dbg("same as log.debug - no other methods accessible through this var");
 ````
 
-Note that if the instance have called `.suppress('debug')` earlier - or it is a `.sub()` of an instance that have called `.suppress('debug')`,
-you would still get a working function from `.get('debug')`. Its output, would on the other hand, be suppressed.
+Note that if `log` have called `.suppress('debug')` earlier - or if it is a `.sub()` of an instance that have called `.suppress('debug')`,
+then you would only get a suppressed function from `.get('debug')`.
 
 ### Global Log Levels
 By only using `.sub()` instances inheriting from a single base instance, you can implement global log levels at compile time by calling `.suppress()`
