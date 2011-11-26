@@ -104,11 +104,17 @@ Logger = (namespaces...) ->
 
   return
 
-# Expose Logger
-module.exports = Logger
+# Expose an instance of Logger
+# Limits API to log methods + get, suppress and sub for passing around
+module.exports = new Logger()
+
+if module is require.main
+  log = module.exports
+  log.error("this is an error message");
+  log.warn("warning").info("info msg").debug("chained debug");
 
 # Quick test
-if module is require.main
+if module is require.main and false
   size = 15
   log = new Logger('EVENTS', 'CONNECTION').pad(size)
   log.suppress('warn','error').warn('should not work').debug('but log chains')

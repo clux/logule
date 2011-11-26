@@ -6,24 +6,31 @@ Shortcut methods for the log levels are available as `log.error`, `log.warn`, `l
 These methods are additionally chainable.
 
 ## Usage
-Here's with a single prefixed namespace:
+Basic usage:
 
 ````javascript
-var Logger = require('logule');
-var log = new Logger('prefix');
+var log = require('logule');
 log.error("this is an error message");
 log.warn("warning").info("info msg").debug("chained debug");
 ````
-![output!](https://github.com/clux/logule/raw/master/output.png)
-### No Namespace
-If Logger is instantiated with no constructor arguments, then the output will simply not contain any prefixes and remove one delimiter.
-Everything will be aligned automatically.
+![simple output!](https://github.com/clux/logule/raw/master/outputsimple.png)
+
+## Namespaces
+With a single namespace
+````javascript
+log.sub('prefix')
+  .error("this is an error message")
+  .warn("warning")
+  .info("info msg")
+  .debug("chained debug");
+````
+![one namespace output!](https://github.com/clux/logule/raw/master/output.png)
 
 ### Multiple Namespaces
 Pass in more strings to get more namespaces prefixed
 
 ````javascript
-var log = new Logger('BUILD', 'COMPILE');
+var log = logule.sub('BUILD', 'COMPILE');
 log.debug('Coffee app.coffee');
 ````
 
@@ -31,7 +38,7 @@ log.debug('Coffee app.coffee');
 Call `.pad(size)` on a logger instance to specify a fixed indentation level for the namespaces.
 
 ````javascript
-var log = new Logger('BUILD').pad(16);
+var log = logule.sub('BUILD').pad(16);
 ````
 
 Messages will here begin 16 + delimiter size characters away from how it would log without a namespace.
@@ -46,8 +53,8 @@ For multiple namespaces, the size applies to each (present) level. Padding will,
 Easiest with multiple namespaces; call `.sub()` and old namespaces will be preserved.
 
 ````javascript
-var log = new Logger('BUILD');
-var sublog = log.sub('COMPILE'); // same as new Logger('BUILD', 'COMPILE')
+var log = logule.sub('BUILD');
+var sublog = log.sub('COMPILE'); // same as logule.sub('BUILD', 'COMPILE')
 ````
 
 A call to `.sub()` without arguments will simply maintain existing namespace(s).
@@ -84,7 +91,7 @@ By only using `.sub()` instances inheriting from a single base instance, you can
 on the base instance - or any branch point you would like - at compile time.
 
 ````javascript
-var log = new Logger('APP');
+var log = require('logule').sub('APP');
 /**
  * // Uncomment this globally suppress:
  * log.suppress('info','debug');
