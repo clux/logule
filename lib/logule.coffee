@@ -26,14 +26,10 @@ construct = (Ctor, args) ->
 
 # Logger Class
 Logger = (namespaces...) ->
-  # TODO.ES6 use named properties instead of this mess perhaps
+  # TODO.ES6? use named properties for these so that everything in constructor style can be avoided
   size = 0
   removed = []
   that = @
-
-  #
-  # Privileged methods
-  #
 
   # Internal error logger
   # returns a new Logger with same namespaces+1, but ignores current filters
@@ -62,9 +58,9 @@ Logger = (namespaces...) ->
     return if single
     that
 
-
+  #
   # Public methods
-
+  #
 
   # Set the padding size
   @pad = (s) ->
@@ -91,12 +87,12 @@ Logger = (namespaces...) ->
 
   # Return a single Logger helper method
   @get = (fn) ->
-    idx = levels.indexOf(fn)
-    return (->) if removed.indexOf(fn) >= 0 # dont allow get to resurrect suppressed fns
-
-    if idx < 0
+    if levels.indexOf(fn) < 0
       internal().error("Invalid function requested to Logule::get - \"#{fn}\" not a valid logger method")
       return (->)
+
+    return (->) if removed.indexOf(fn) >= 0 # dont allow @get to resurrect suppressed fns
+
     l = that.sub()
     l.suppress.apply({}, levels) # suppress all
     (args...) -> log.apply(l, [fn, true].concat(args))
