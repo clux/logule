@@ -13,10 +13,12 @@ var log = require('logule');
 log.error("this is an error message");
 log.warn("warning").info("info msg").debug("chained debug");
 ````
+
 ![simple output!](https://github.com/clux/logule/raw/master/outputsimple.png)
 
 ## Namespaces
 With a single namespace
+
 ````javascript
 log.sub('prefix')
   .error("this is an error message")
@@ -24,6 +26,7 @@ log.sub('prefix')
   .info("info msg")
   .debug("chained debug");
 ````
+
 ![one namespace output!](https://github.com/clux/logule/raw/master/output.png)
 
 ### Multiple Namespaces
