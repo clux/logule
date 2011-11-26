@@ -86,9 +86,9 @@ on the base instance - or any branch point you would like - at compile time.
 ````javascript
 var log = new Logger('APP');
 /**
-* Uncomment to globally suppress
-* log.suppress('info','debug');
-*/
+ * // Uncomment this globally suppress:
+ * log.suppress('info','debug');
+**/
 var modelsLog = log.sub('MODEL');
 var eventsLog = log.sub('EVENT');
 //pass the two log files down

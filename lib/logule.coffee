@@ -26,13 +26,14 @@ construct = (Ctor, args) ->
 
 # Logger Class
 Logger = (namespaces...) ->
+  # TODO.ES6 used named properties instead of this mess perhaps
   size = 0
   removed = []
   that = @
 
-
+  #
   # Privileged methods
-
+  #
 
   # Internal error logger
   # returns a new Logger with same namespaces+1, but ignores current filters
