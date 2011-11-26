@@ -68,7 +68,7 @@ This can be done because **sub() is a new clone:**
 `log.sub()` maintains all padding, suppressed log levels and namespace properties set on the original `log` instance.
 
 ### Filtering log
-#### Standard Way
+#### Suppress
 Suppressing logs from an instance is done in a very neat, propagating, and non-breaking way.
 `.suppress(methods...)` suppresses output from specified methods, but still allows them to be called, and they still chain.
 
@@ -78,9 +78,12 @@ log.warn('works').info('suppressed').error('works').debug('suppressed');
 ````
 
 Once a method has been suppressed, it cannot be unsuppressed.
-If you want temporary suppression, use a `.sub()`.
-#### Simple Function way
-A debug module might only need `log.debug`. You can save typing by calling `.get('debug')` on an instance to return the correctly bound instance method to pass down.
+All subclasses subsequently created will also be suppressed.
+If you want temporary suppression, use a temporary `.sub()`.
+
+#### Get Method
+A debug module should only need `log.debug`. You can save typing, and enforce this behaviour by calling `.get('debug')` on an instance,
+to return the correctly bound instance method to pass down.
 
 ````javascript
 var dbg = log.get('debug');
@@ -90,22 +93,16 @@ dbg("same as log.debug - no other methods accessible through this var");
 Note that if `log` have called `.suppress('debug')` earlier - or if it is a `.sub()` of an instance that have called `.suppress('debug')`,
 then you would only get a suppressed function from `.get('debug')`.
 
-````javascript
-log.suppress('debug')
-var dbg = log.get('debug');
-dbg("suppressed");
-````
-
 ### Global Log Levels
 By only using `.sub()` instances inheriting from a single base instance, you can implement global log levels at compile time by calling `.suppress()`
 on the base instance - or any branch point you would like - at compile time.
 
 ````javascript
 var log = require('logule').sub('APP');
-/**
- * // Uncomment this globally suppress:
- * log.suppress('info','debug');
-**/
+
+// Uncomment this globally suppress:
+//log.suppress('info','debug');
+
 var modelsLog = log.sub('MODEL');
 var eventsLog = log.sub('EVENT');
 //pass the two log instances down
