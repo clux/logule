@@ -23,9 +23,10 @@ logule
 To add a namespace prefix, subclass logule and pass it in
 
 ````javascript
-log = logule.sub('prefix')
-log.error("this is an error message")
-log.warn("warning").info("info msg").debug("chained debug");
+log = logule.sub('BUILD');
+log.trace("Trying to compile main.js");
+log.error("Failed");
+logule.info("Shutting down")
 ````
 
 ![one namespace output!](https://github.com/clux/logule/raw/master/output.png)

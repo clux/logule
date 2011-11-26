@@ -108,11 +108,6 @@ Logger = (namespaces...) ->
 # Limits API to log methods + get, suppress and sub for passing around
 module.exports = new Logger()
 
-if module is require.main
-  log = module.exports
-  log.error("this is an error message");
-  log.warn("warning").info("info msg").debug("chained debug");
-
 # Quick test
 if module is require.main and false
   size = 15
