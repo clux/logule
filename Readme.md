@@ -52,7 +52,7 @@ Large namespaces (>specified size), will stand out from the crowd.
 
 ## Passing log around
 ### Subclasses
-More advanced use of `.sub()` involve inheriting based on namespaces, and linking them together.
+A good use of `.sub()` involve inheriting based on namespaces, and linking them together.
 
 ````javascript
 var log = logule.sub('BUILD');
@@ -63,7 +63,8 @@ var sublog = log.sub('COMPILE');
 
 It is advantageous to do 'one namespace sub at a time', as then it is easy to filter log output from large chunks of code at a time.
 
-This can be done because **`.sub()` is a new clone**:
+This can be done because **sub() is a new clone:**
+
 `log.sub()` maintains all padding, suppressed log levels and namespace properties set on the original `log` instance.
 
 ### Filtering log
