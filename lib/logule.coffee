@@ -104,6 +104,14 @@ Logger = (namespaces...) ->
 
   return
 
+# Middleware generator
+# Will inherit from current logger
+Logger::getMiddleware = ->
+  log = @sub('EXPRESS')
+  (req, res, next) ->
+    log.trace(req.method, req.url.toString())
+    next()
+
 # Expose an instance of Logger
 # Limits API to log methods + get, suppress and sub for passing around
 module.exports = new Logger()
