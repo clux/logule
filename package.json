@@ -11,9 +11,17 @@
   "engines": {
     "node": ">=0.4.10"
   },
+  "scripts": {
+    "test": "expresso"
+  },
   "dependencies": {
     "coffee-script": "~1.1.3",
     "colors": "~0.5.1"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "expresso": "~0.9.0"
+  },
+  "bugs": {
+    "url": "http://github.com/clux/logule/issues"
+  }
 }
