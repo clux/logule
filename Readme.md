@@ -1,4 +1,4 @@
-# Logule ![travis build status](https://secure.travis-ci.org/clux/modul8.png)
+# Logule ![travis build status](https://secure.travis-ci.org/clux/logule.png)
 
 Logule is an advanced logging utility for nodejs. It is analogous to `console.log` and can take multiple arguments,
 but additionally it prefixes the current time, the log level, and optionally, prefixed namespaces (with optional padding).

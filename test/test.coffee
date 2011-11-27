@@ -55,6 +55,8 @@ hook = (cb) ->
   # undo damage fn returned
   -> process.stdout.write = write
 
+testMsg = "this is a test message"
+
 exports["test stdout"] = ->
   testCount = 0
   stdlog = logule.sub('STDOUT')
@@ -63,9 +65,11 @@ exports["test stdout"] = ->
     saved = str
 
   for lvl in levels
-    stdlog[lvl](1)
+    stdlog[lvl](testMsg)
     assert.includes(saved, lvl.toUpperCase(), "captured stdlog contains correct log type")
-    testCount += 1
+    assert.includes(saved, testMsg, "captured stdlog contains input message")
+    testCount += 2
+
 
   unhook()
   log "stdout - completed", testCount
