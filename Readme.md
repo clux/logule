@@ -18,7 +18,7 @@ logule
   .debug("chained debug");
 ````
 
-![simple output!](https://github.com/clux/logule/imgs/raw/master/outputsimple.png)
+![simple output!](https://github.com/clux/logule/raw/master/imgs/outputsimple.png)
 
 ## Namespaces
 To add a namespace prefix, subclass logule and pass it in
@@ -30,7 +30,7 @@ log.error("Failed");
 logule.info("Shutting down")
 ````
 
-![one namespace output!](https://github.com/clux/logule/imgs/raw/master/output.png)
+![one namespace output!](https://github.com/clux/logule/raw/master/imgs/output.png)
 
 ### Multiple Namespaces
 Pass in more strings to get more namespaces prefixed
@@ -62,7 +62,7 @@ log.line('who called me?');
 log.line('and now?');
 ```
 
-![line output!](https://github.com/clux/logule/imgs/raw/master/line.png)
+![line output!](https://github.com/clux/logule/raw/master/imgs/line.png)
 
 ## Passing log around
 ### Subclasses
