@@ -3,7 +3,7 @@
 Logule is an advanced logging utility for nodejs. It is analogous to `console.log` and can take multiple arguments,
 but additionally it prefixes the current time, the log level, and optionally, prefixed namespaces (with optional padding).
 
-Shortcut methods for the log levels are available as `log.error`, `log.warn`, `log.info`, `log.debug` and `log.trace`.
+Shortcut methods for the log levels are available as `log.error`, `log.warn`, `log.info`, `log.debug`, `log.trace`, `log.line` and `log.zalgo`.
 These methods are additionally chainable.
 
 ## Usage
@@ -99,7 +99,7 @@ By only using `.sub()` instances inheriting from a single base instance, you can
 on the base instance - or any branch point you would like - at compile time.
 
 ````javascript
-var log = require('logule').sub('APP');
+var log = logule.sub('APP');
 
 // Uncomment this globally suppress:
 //log.suppress('info','debug');
@@ -108,6 +108,19 @@ var modelsLog = log.sub('MODEL');
 var eventsLog = log.sub('EVENT');
 //pass the two log instances down
 ````
+
+## Line
+An awesome feature inspired by [nlogger](https://github.com/igo/nlogger) - but using logule semantics:
+Reads the line and filename of the calling function by inspecting the stack:
+
+````javascript
+log = logule.sub('CRAZYDEBUG')
+log.debug('dumping lines to console');
+log.line('who called me?');
+log.line('and now?');
+```
+
+![line output!](https://github.com/clux/logule/raw/master/line.png)
 
 ## Zalgo
 H̸̡̪̯ͨ͊̽̅̾̎Ȩ̬̩̾͛ͪ̈́̀́͘ ̶̧̨̱̹̭̯ͧ̾ͬC̷̙̲̝͖ͭ̏ͥͮ͟Oͮ͏̮̪̝͍M̲̖͊̒ͪͩͬ̚̚͜Ȇ̴̟̟͙̞ͩ͌͝S̨̥̫͎̭ͯ̿̔̀ͅ

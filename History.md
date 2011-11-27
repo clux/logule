@@ -1,3 +1,7 @@
+0.5.0 / 2011-11-28
+==================
+  * logule.line() for those cases where you quickly want to find what went wrong
+
 0.4.1 / 2011-11-27
 ==================
   * logule is fully testable

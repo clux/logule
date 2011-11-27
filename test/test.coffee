@@ -1,7 +1,7 @@
 logule    = require('../')
 assert    = require 'assert'
 
-levels = ['trace','debug','info','warn','error','zalgo']
+levels = ['trace','debug','info','warn','error','zalgo', 'line']
 
 l = logule.sub('suppressed')
 l.suppress.apply({}, levels)

@@ -8,6 +8,7 @@ levelMaps =
   'debug' : c.cyan
   'trace' : c.grey
   'zalgo' : c.zalgo
+  'line'  : c.bold
 
 levels = Object.keys(levelMaps)
 
@@ -95,12 +96,29 @@ Logger = (namespaces...) ->
 
     l = that.sub()
     l.suppress.apply({}, levels) # suppress all
-    (args...) -> log.apply(l, [fn, true].concat(args))
+    if fn is 'line'
+      return (args...) -> that.line.apply(l, args)
+    return (args...) -> log.apply(l, [fn, true].concat(args))
 
   # Generate one shortcut method per level
   levels.forEach (name) ->
+    return if name is 'line' # line handled separately
     that[name] = (args...) ->
       log.apply(that, [name, false].concat(args))
+
+  # Line logger
+  @line = (args...) ->
+    # get caller file and line number from stack
+    e = new Error().stack.split('\n')[2].split(':')
+    line = e[1]
+    file = if module is require.main
+      'main'
+    else
+      e[0].split('/')[-1...] # only want filename
+    namespaces.push file+":"+line
+    res = log.apply(that, ['line', false].concat(args))
+    namespaces.pop()
+    res
 
   return
 
