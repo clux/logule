@@ -115,24 +115,3 @@ Logger::makeMiddleware = ->
 # Expose an instance of Logger
 # Limits API to log methods + get, suppress and sub for passing around
 module.exports = new Logger()
-
-# Quick test
-if module is require.main
-  size = 15
-  log = new Logger('EVENTS', 'CONNECTION').pad(size)
-  log.suppress('warn','error').warn('should not work').debug('but log chains')
-
-  log = new Logger('CONNECTION').pad(size)
-  sublog = log.sub('ESTABLISHMENT')
-  sublog.warn('works')
-  log.suppress('warn')
-  log.warn('wont work1')
-  log = log.sub('REMOVAL')
-  log.warn('wont work2').trace('tracer test')
-
-
-  zalgo = log.get('zalgo')
-  zalgo("zalgo", 23432, 234)
-
-  log = new Logger()
-  log.error('this is very bad').zalgo('he comes').info('try xhtml')
