@@ -7,12 +7,20 @@ l = logule.sub('suppressed')
 l.suppress.apply({}, levels)
 log = logule.sub('LOGULE', 'TEST').get('info')
 
-exports["test chaining"] = ->
+exports["test chaining"] = -> #TODO: logule chains, but not l? wtf
   for lvl in levels
     assert.equal(l, l[lvl](1), "l.#{lvl} chains")
-  log 'chaining - completed:', levels.length
+    assert.isUndefined(l.get(lvl)(1), "l.get('#{lvl}') does not chain")
 
-privates = ['internal', 'log' ]
+    sub = l.sub('wee')
+    assert.equal(sub.info('wat'), sub, "sub chains")
+    single = sub.get(lvl)
+    assert.isUndefined(single('wat'), "sub single returns undefined")
+
+
+  log 'chaining - completed:', 4*levels.length
+
+privates = ['internal', 'log', 'namespaces', 'size', 'removed']
 
 exports["test encapsulation"] = ->
   for priv in privates

@@ -1,4 +1,8 @@
-0.5.0 / 2011-11-28
+0.5.1 / 2011-11-28
+==================
+  * logule.get('line') does not chain like the other get() functions
+
+0.5.0 / 2011-11-27
 ==================
   * logule.line() for those cases where you quickly want to find what went wrong
 
@@ -6,7 +10,7 @@
 ==================
   * logule is fully testable
 
-0.4.0 / 2011-11-27
+0.4.0 / 2011-11-26
 ==================
   * require output is a new instance that can be used directly -> no `new` operator required - use `sub` liberally
   * experimental middleware generator included

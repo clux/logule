@@ -51,6 +51,19 @@ log.warn('my namespaces are padded');
 Messages will here begin `(16 + delimiter_size)*num_namespaces` characters out.
 Large namespaces (>specified size), will stand out from the crowd.
 
+## Line
+An awesome feature inspired by [nlogger](https://github.com/igo/nlogger) - but using logule semantics;
+`logule.line()` reads the line and filename of the calling function by inspecting the stack.
+
+````javascript
+log = logule.sub('CRAZYDEBUG');
+log.debug('dumping lines to console');
+log.line('who called me?');
+log.line('and now?');
+```
+
+![line output!](https://github.com/clux/logule/raw/master/line.png)
+
 ## Passing log around
 ### Subclasses
 A good use of `.sub()` involve inheriting based on namespaces, and linking them together.
@@ -108,19 +121,6 @@ var modelsLog = log.sub('MODEL');
 var eventsLog = log.sub('EVENT');
 //pass the two log instances down
 ````
-
-## Line
-An awesome feature inspired by [nlogger](https://github.com/igo/nlogger) - but using logule semantics.
-`logule.line()` reads the line and filename of the calling function by inspecting the stack:
-
-````javascript
-log = logule.sub('CRAZYDEBUG')
-log.debug('dumping lines to console');
-log.line('who called me?');
-log.line('and now?');
-```
-
-![line output!](https://github.com/clux/logule/raw/master/line.png)
 
 ## Zalgo
 H̸̡̪̯ͨ͊̽̅̾̎Ȩ̬̩̾͛ͪ̈́̀́͘ ̶̧̨̱̹̭̯ͧ̾ͬC̷̙̲̝͖ͭ̏ͥͮ͟Oͮ͏̮̪̝͍M̲̖͊̒ͪͩͬ̚̚͜Ȇ̴̟̟͙̞ͩ͌͝S̨̥̫͎̭ͯ̿̔̀ͅ

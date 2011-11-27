@@ -39,7 +39,7 @@ Logger = (namespaces...) ->
 
   # Log base method
   # chains if it was not obtained via @get
-  log = (lvl, single, args...) ->
+  log = (lvl, args...) ->
     delim = levelMaps[lvl]('-')
     level = pad(lvl, max_lvl).toUpperCase()
 
@@ -56,7 +56,6 @@ Logger = (namespaces...) ->
       if lvl is 'error' then c.bold level else level
       delim
     ].concat(end, args)
-    return if single
     that
 
   #
@@ -97,14 +96,18 @@ Logger = (namespaces...) ->
     l = that.sub()
     l.suppress.apply({}, levels) # suppress all
     if fn is 'line'
-      return (args...) -> that.line.apply(l, args)
-    return (args...) -> log.apply(l, [fn, true].concat(args))
+      return (args...) ->
+        that.line.apply(l, args)
+        return
+    return (args...) ->
+      log.apply(l, [fn].concat(args))
+      return
 
   # Generate one shortcut method per level
   levels.forEach (name) ->
     return if name is 'line' # line handled separately
     that[name] = (args...) ->
-      log.apply(that, [name, false].concat(args))
+      log.apply(that, [name].concat(args))
 
   # Line logger
   @line = (args...) ->
@@ -116,7 +119,7 @@ Logger = (namespaces...) ->
     else
       e[0].split('/')[-1...] # only want filename
     namespaces.push file+":"+line
-    res = log.apply(that, ['line', false].concat(args))
+    res = log.apply(that, ['line'].concat(args))
     namespaces.pop()
     res
 
