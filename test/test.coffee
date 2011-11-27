@@ -1,7 +1,7 @@
 logule    = require('../')
 assert    = require 'assert'
 
-levels = ['zalgo','info','warn','error','trace','debug']
+levels = ['trace','debug','info','warn','error','zalgo']
 
 l = logule.sub('suppressed')
 l.suppress.apply({}, levels)
@@ -41,9 +41,31 @@ exports["test exports"] = ->
   log "exports - completed:", testCount
 
 
-exports["test output"] = ->
-  #sin = process.openStdin()
-  #sin.on 'data', (line) ->
-  #  console.log "got line", line
-  #console.log("test line")
-  return
+# stdout monkey-patch
+hook = (cb) ->
+  write = process.stdout.write
+  replacement = (stub) ->
+    (string, encoding, fd) ->
+      # hide output in test
+      #stub.apply(process.stdout, arguments)
+      cb(string, encoding, fd)
+
+  process.stdout.write = replacement(process.stdout.write)
+
+  # undo damage fn returned
+  -> process.stdout.write = write
+
+exports["test stdout"] = ->
+  testCount = 0
+  stdlog = logule.sub('STDOUT')
+  saved = ""
+  unhook = hook (str, enc, fd) ->
+    saved = str
+
+  for lvl in levels
+    stdlog[lvl](1)
+    assert.includes(saved, lvl.toUpperCase(), "captured stdlog contains correct log type")
+    testCount += 1
+
+  unhook()
+  log "stdout - completed", testCount
