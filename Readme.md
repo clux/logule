@@ -110,8 +110,8 @@ var eventsLog = log.sub('EVENT');
 ````
 
 ## Line
-An awesome feature inspired by [nlogger](https://github.com/igo/nlogger) - but using logule semantics:
-Reads the line and filename of the calling function by inspecting the stack:
+An awesome feature inspired by [nlogger](https://github.com/igo/nlogger) - but using logule semantics.
+`logule.line()` reads the line and filename of the calling function by inspecting the stack:
 
 ````javascript
 log = logule.sub('CRAZYDEBUG')
