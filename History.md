@@ -1,3 +1,7 @@
+0.4.1 / 2011-11-27
+==================
+  * logule is fully testable
+
 0.4.0 / 2011-11-27
 ==================
   * require output is a new instance that can be used directly -> no `new` operator required - use `sub` liberally

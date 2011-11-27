@@ -122,5 +122,18 @@ log.zalgo("all is lost");
 $ npm install logule
 ````
 
+## Running tests
+Install development dependencies
+
+````bash
+$ npm install
+````
+
+Run the tests
+
+````bash
+$ npm test
+````
+
 ## License
 MIT-Licensed. See LICENSE file for details.
