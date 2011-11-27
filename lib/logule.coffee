@@ -106,7 +106,7 @@ Logger = (namespaces...) ->
 
 # Middleware generator
 # Will inherit from current logger
-Logger::getMiddleware = ->
+Logger::makeMiddleware = ->
   log = @sub('EXPRESS')
   (req, res, next) ->
     log.trace(req.method, req.url.toString())
@@ -117,7 +117,7 @@ Logger::getMiddleware = ->
 module.exports = new Logger()
 
 # Quick test
-if module is require.main and false
+if module is require.main
   size = 15
   log = new Logger('EVENTS', 'CONNECTION').pad(size)
   log.suppress('warn','error').warn('should not work').debug('but log chains')
