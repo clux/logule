@@ -122,6 +122,21 @@ var eventsLog = log.sub('EVENT');
 //pass the two log instances down
 ````
 
+### Verifying Logule Validity
+When passing logule subs around, it might be useful for separate code to test whether what is received is an actual Logule instance or not.
+To verify this, use instanceof versus logule.class to check.
+
+````javascript
+var logule = require('logule');
+function(logInput) {
+  var safeLog = (logInput instanceof logule.class) ? logInput : logule.sub('myModule');
+  safeLog.info('guaranteed to work');
+}
+````
+
+Note that single functions like `logule.get('info')` will of course not pass this test.
+If your API expects a single logger function, then it can only type test the input as a function.
+
 ## Zalgo
 H̸̡̪̯ͨ͊̽̅̾̎Ȩ̬̩̾͛ͪ̈́̀́͘ ̶̧̨̱̹̭̯ͧ̾ͬC̷̙̲̝͖ͭ̏ͥͮ͟Oͮ͏̮̪̝͍M̲̖͊̒ͪͩͬ̚̚͜Ȇ̴̟̟͙̞ͩ͌͝S̨̥̫͎̭ͯ̿̔̀ͅ
 

@@ -1,4 +1,5 @@
-c = require('colors')
+c  = require('colors')
+fs = require('fs')
 
 # Log levels
 levelMaps =
@@ -109,7 +110,7 @@ Logger = (namespaces...) ->
     that[name] = (args...) ->
       log.apply(that, [name].concat(args))
 
-  # Line logger
+  # Line logger is different
   @line = (args...) ->
     # get caller file and line number from stack
     e = new Error().stack.split('\n')[2].split(':')
@@ -136,3 +137,6 @@ Logger::makeMiddleware = ->
 # Expose an instance of Logger
 # Limits API to log methods + get, suppress and sub for passing around
 module.exports = new Logger()
+
+# Expose class for purposes of type testing
+module.exports.class = Logger

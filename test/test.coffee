@@ -5,7 +5,7 @@ levels = ['trace','debug','info','warn','error','zalgo', 'line']
 
 l = logule.sub('suppressed')
 l.suppress.apply({}, levels)
-log = logule.sub('LOGULE', 'TEST').get('info')
+log = logule.sub('LOGULE').get('info')
 
 exports["test chaining"] = -> #TODO: logule chains, but not l? wtf
   for lvl in levels
@@ -47,6 +47,28 @@ exports["test exports"] = ->
     testCount += 1
 
   log "exports - completed:", testCount
+
+
+exports["test typeTest"] = ->
+  assert.ok(logule instanceof logule.class, "logule is an instanceof logule.class")
+  assert.ok(!(logule.get('info') instanceof logule.class), "logule.get('info') !instanceof logule.class")
+  assert.ok(logule.sub('arst') instanceof logule.class, "logule.sub('arst') instanceof logule.class")
+  assert.ok(!(logule.sub('arst').get('line') instanceof logule.class), "logule.sub('arst').get('line')  !instanceof logule.class")
+
+
+  assert.ok(l instanceof logule.class, "l is an instanceof logule.class")
+  assert.ok(!(l.get('info') instanceof logule.class), "l.get('info') !instanceof logule.class")
+  assert.ok(l.sub('arst') instanceof logule.class, "l.sub('arst') is an instanceof logule.class")
+  assert.ok(!(l.sub('arst').get('info') instanceof logule.class), "l.sub('arst').get('info') !instanceof logule.class")
+
+  testCount = 8
+
+  for lvl in levels
+    assert.ok(l.get(lvl) instanceof Function, "l.get('#{lvl}') returns a function")
+    testCount += 1
+
+  log "exports - completed:", testCount
+
 
 exports["test sub"] = ->
   assert.ok(logule is logule, "obvious test")

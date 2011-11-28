@@ -1,4 +1,8 @@
-0.5.1 / 2011-11-28
+0.5.2 / 2011-11-29
+==================
+  * logule.class contains the class for instanceof testing in modules that expect a logule instance
+
+0.5.1 / 2011-11-27
 ==================
   * logule.get('line') does not chain, like the other get() functions
 
