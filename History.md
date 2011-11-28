@@ -1,6 +1,6 @@
 0.5.1 / 2011-11-28
 ==================
-  * logule.get('line') does not chain like the other get() functions
+  * logule.get('line') does not chain, like the other get() functions
 
 0.5.0 / 2011-11-27
 ==================

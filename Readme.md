@@ -21,7 +21,7 @@ logule
 ![simple output!](https://github.com/clux/logule/raw/master/imgs/outputsimple.png)
 
 ## Namespaces
-To add a namespace prefix, subclass logule and pass it in
+To add a namespace prefix, subclass logule with it:
 
 ````javascript
 log = logule.sub('BUILD');
