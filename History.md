@@ -1,4 +1,4 @@
-0.5.2 / 2011-11-30
+0.5.2 / 2011-12-01
 ==================
   * logger.data exposes a frozen object with the current namespaces and logule version
   * logule.verify(inst) will verify that another logule instance is compatible with this (using exposed data.version on prototype)
