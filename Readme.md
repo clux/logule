@@ -123,14 +123,17 @@ var eventsLog = log.sub('EVENT');
 ````
 
 ### Verifying Logule Validity
-When passing logule subs around, it might be useful for separate code to test whether what is received is an actual Logule instance or not.
-To verify this, use instanceof versus logule.class to check.
+When passing logule subs around, it might be useful for separate code to test whether what is received is an appropriate Logule instance or not.
+Unfortunately, instanceof testing against your installed logule will only work when your code is not separated into modules.
+Therefore, to support npm module style where there are possible multiple installations of logule spread around, the module can test that the
+one passed in has a version compatible with the module's own using a built in helper function.
 
 ````javascript
 var logule = require('logule');
 function(logInput) {
-  var safeLog = (logInput instanceof logule.class) ? logInput : logule.sub('myModule');
-  safeLog.info('guaranteed to work');
+  if (logule.verify(logInput)) {
+    // logInput is an instance of logule, and its version is ~logule.info.version
+  }
 }
 ````
 

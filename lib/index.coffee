@@ -1,5 +1,6 @@
-c  = require('colors')
-fs = require('fs')
+c       = require('colors')
+fs      = require('fs')
+semver  = require('semver')
 
 # Log levels
 levelMaps =
@@ -26,12 +27,21 @@ construct = (Ctor, args) ->
   F:: = Ctor::
   new F()
 
+# Version, read synchronously once on require only
+version = JSON.parse(fs.readFileSync(__dirname+'/../package.json', 'utf8')).version
+
 # Logger Class
 Logger = (namespaces...) ->
   # TODO.ES6? use name objects for these 3 so that everything in constructor style can be avoided
   size = 0
   removed = []
   that = @
+
+  # Expose inspectable info
+  @data = {version, namespaces}
+
+  # Dont allow modules to pretend to be compatible
+  Object.freeze(@data)
 
   # Internal error logger
   # returns a new Logger with same namespaces+1, but ignores current filters
@@ -134,9 +144,14 @@ Logger::makeMiddleware = ->
     log.trace(req.method, req.url.toString())
     next()
 
+# Verify that an instance is an up to date Logger instance
+Logger::verify = (inst) ->
+  return false if !inst.data?.version
+
+  # inst.version only varies by patch number positively
+  return semver.satisfies(inst.data.version, "~"+@data.version)
+
+
 # Expose an instance of Logger
 # Limits API to log methods + get, suppress and sub for passing around
 module.exports = new Logger()
-
-# Expose class for purposes of type testing
-module.exports.class = Logger

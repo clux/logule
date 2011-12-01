@@ -1,6 +1,7 @@
-0.5.2 / 2011-11-29
+0.5.2 / 2011-11-30
 ==================
-  * logule.class contains the class for instanceof testing in modules that expect a logule instance
+  * logger.data exposes a frozen object with the current namespaces and logule version
+  * logule.verify(inst) will verify that another logule instance is compatible with this (using exposed data.version on prototype)
 
 0.5.1 / 2011-11-27
 ==================

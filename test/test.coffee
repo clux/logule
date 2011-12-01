@@ -27,13 +27,17 @@ exports["test encapsulation"] = ->
     assert.isUndefined(l[priv], "l.#{priv} is encapsulated")
   log 'encapsulation - completed:', privates.length
 
-public = ['get', 'suppress', 'sub', 'pad', 'makeMiddleware']
+public = ['get', 'suppress', 'sub', 'pad', 'makeMiddleware', 'verify', 'data']
 
 exports["test exports"] = ->
-  for p in public
+  for p in public when p isnt 'data'
     assert.isDefined(l[p], "l.#{p} is exported")
     assert.type(l[p], 'function', "l.#{p} is function")
-  testCount = 2*public.length
+
+  assert.isDefined(l.data, "l.data is exported")
+  assert.isDefined(l.data.version, "l.data.version is exported")
+  assert.isDefined(l.data.namespaces, "l.data.namespaces is exported")
+  testCount = 2*public.length-2 + 3
 
   for lvl in levels
     fn = l.get(lvl)
@@ -50,16 +54,16 @@ exports["test exports"] = ->
 
 
 exports["test typeTest"] = ->
-  assert.ok(logule instanceof logule.class, "logule is an instanceof logule.class")
-  assert.ok(!(logule.get('info') instanceof logule.class), "logule.get('info') !instanceof logule.class")
-  assert.ok(logule.sub('arst') instanceof logule.class, "logule.sub('arst') instanceof logule.class")
-  assert.ok(!(logule.sub('arst').get('line') instanceof logule.class), "logule.sub('arst').get('line')  !instanceof logule.class")
+  assert.ok(logule.verify(logule), "logule.verify(logule) is logule")
+  assert.ok(!(logule.verify(logule.get('info'))), "logule.verify(logule.get('info')) is false")
+  assert.ok(logule.sub('arst').verify(logule), "logule.sub('arst').verify(logule) is true")
+  assert.ok(logule.verify(logule.sub('arst')), "logule.verify(logule.sub('arst')) is true")
 
 
-  assert.ok(l instanceof logule.class, "l is an instanceof logule.class")
-  assert.ok(!(l.get('info') instanceof logule.class), "l.get('info') !instanceof logule.class")
-  assert.ok(l.sub('arst') instanceof logule.class, "l.sub('arst') is an instanceof logule.class")
-  assert.ok(!(l.sub('arst').get('info') instanceof logule.class), "l.sub('arst').get('info') !instanceof logule.class")
+  assert.ok(logule.verify(l), "logule.verify(l)")
+  assert.ok(logule.verify(l.sub('arst')), "logule.verify(l.sub('arst'))")
+  assert.ok(l.verify(logule), "l.verify(logule)")
+  assert.ok(l.sub('arst').verify(logule), "l.sub('arst').verify(logule)")
 
   testCount = 8
 

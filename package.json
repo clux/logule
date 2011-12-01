@@ -16,7 +16,8 @@
   },
   "dependencies": {
     "coffee-script": "~1.1.3",
-    "colors": "~0.5.1"
+    "colors": "~0.5.1",
+    "semver": "~1.0.12"
   },
   "devDependencies": {
     "expresso": "~0.9.0"
