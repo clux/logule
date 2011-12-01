@@ -7,7 +7,7 @@ l = logule.sub('suppressed')
 l.suppress.apply({}, levels)
 log = logule.sub('LOGULE').get('info')
 
-exports["test chaining"] = -> #TODO: logule chains, but not l? wtf
+exports["test chaining"] = ->
   for lvl in levels
     assert.equal(l, l[lvl](1), "l.#{lvl} chains")
     assert.isUndefined(l.get(lvl)(1), "l.get('#{lvl}') does not chain")

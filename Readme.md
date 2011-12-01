@@ -138,7 +138,7 @@ function(logInput) {
 ````
 
 Note that single functions like `logule.get('info')` will of course not pass this test.
-If your API expects a single logger function, then it can only type test the input as a function.
+If your API expects a single logger function, then you should only type test the input as a function.
 
 ## Zalgo
 H̸̡̪̯ͨ͊̽̅̾̎Ȩ̬̩̾͛ͪ̈́̀́͘ ̶̧̨̱̹̭̯ͧ̾ͬC̷̙̲̝͖ͭ̏ͥͮ͟Oͮ͏̮̪̝͍M̲̖͊̒ͪͩͬ̚̚͜Ȇ̴̟̟͙̞ͩ͌͝S̨̥̫͎̭ͯ̿̔̀ͅ
