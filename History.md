@@ -1,3 +1,7 @@
+0.5.3 / 2011-12-06
+==================
+  * Explicit coffee-script dependency removed - now each new version is recompiiled before release
+
 0.5.2 / 2011-12-01
 ==================
   * logger.data exposes a frozen object with the current namespaces and logule version

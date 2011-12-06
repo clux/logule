@@ -128,7 +128,7 @@ Logger = (namespaces...) ->
     file = if module is require.main
       'main'
     else
-      e[0].split('/')[-1...] # only want filename
+      e[0].split('/')[-1...][0] # only want filename
     namespaces.push file+":"+line
     res = log.apply(that, ['line'].concat(args))
     namespaces.pop()
