@@ -1,3 +1,8 @@
+0.5.4 / 2011-12-13
+==================
+  * CoffeeScript removed entirely - JSHint is better for safe JS (found a couple of implicit returns errors with CS that are now fixed)
+  * Paths should work on windows (used unix slashes for version)
+
 0.5.3 / 2011-12-06
 ==================
   * Explicit coffee-script dependency removed - now each new version is recompiiled before release

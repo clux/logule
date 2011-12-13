@@ -1,9 +1,10 @@
 var c = require('colors')
   , fs = require('fs')
+  , path = require('path')
   , semver = require('semver')
   , slice = Array.prototype.slice
   , noop = function () {}
-  , version = JSON.parse(fs.readFileSync(__dirname + '/package.json', 'utf8')).version;
+  , version = JSON.parse(fs.readFileSync(path.join(__dirname, 'package.json'), 'utf8')).version;
 
 // Levels and their log output delimiter color fn
 var levelMaps = {
