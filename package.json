@@ -7,7 +7,7 @@
     "type": "git",
     "url": "git://github.com/clux/logule.git"
   },
-  "main": "index.js",
+  "main": "logule.js",
   "engines": {
     "node": ">=0.4.10"
   },
@@ -19,7 +19,6 @@
     "semver": "~1.0.12"
   },
   "devDependencies": {
-    "coffee-script": "~1.1.3",
     "expresso": "~0.9.0"
   },
   "bugs": {
