@@ -132,7 +132,7 @@ one passed in has a version compatible with the module's own using a built in he
 var logule = require('logule');
 function(logInput) {
   if (logule.verify(logInput)) {
-    // logInput is an instance of logule, and its version is ~logule.info.version
+    // logInput is an instance of logule, and its version is ~logule.data.version
   }
 }
 ````
