@@ -1,3 +1,7 @@
+0.5.5 / 2011-12-14
+==================
+  * Slight tweak to verifier (could not handle null elements before this version)
+
 0.5.4 / 2011-12-13
 ==================
   * CoffeeScript removed entirely - JSHint is better for safe JS (found a couple of implicit returns errors with CS that are now fixed)

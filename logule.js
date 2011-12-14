@@ -8,13 +8,13 @@ var c = require('colors')
 
 // Levels and their log output delimiter color fn
 var levelMaps = {
-    'error' : c.red
-  , 'warn'  : c.yellow
-  , 'info'  : c.green
-  , 'debug' : c.cyan
-  , 'trace' : c.grey
-  , 'zalgo' : c.zalgo
-  , 'line'  : c.bold
+  'error' : c.red
+, 'warn'  : c.yellow
+, 'info'  : c.green
+, 'debug' : c.cyan
+, 'trace' : c.grey
+, 'zalgo' : c.zalgo
+, 'line'  : c.bold
 };
 var levels = Object.keys(levelMaps);
 
@@ -51,8 +51,8 @@ function Logger() {
 
   // Expose inspectable info
   this.data = {
-      version   : version
-    , namespaces: namespaces
+    version   : version
+  , namespaces: namespaces
   };
 
   // But dont allow it to be modified
@@ -76,10 +76,10 @@ function Logger() {
     }, []);
 
     console.log.apply(console, [
-        c.grey(new Date().toLocaleTimeString())
-      , delim
-      , (lvl === 'error') ? c.bold(level) : level
-      , delim
+      c.grey(new Date().toLocaleTimeString())
+    , delim
+    , (lvl === 'error') ? c.bold(level) : level
+    , delim
     ].concat(end, args));
 
     return that;
@@ -178,7 +178,7 @@ Logger.prototype.makeMiddleware = function (expressPrefix) {
 
 // Verify that an instance is an up to date Logger instance
 Logger.prototype.verify = function (inst) {
-  if (!inst.data || !inst.data.version) {
+  if (!inst || !inst.data || !inst.data.version) {
     return false;
   }
   // inst.version only varies by patch number positively
