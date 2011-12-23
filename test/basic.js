@@ -71,7 +71,11 @@ exports["test verify"] = function () {
   assert.ok(logule.verify(l.sub('arst')), "logule.verify(l.sub('arst'))");
   assert.ok(l.verify(logule), "l.verify(logule)");
   assert.ok(l.sub('arst').verify(logule), "l.sub('arst').verify(logule)");
-  testCount += 8;
+  assert.ok(!l.verify(), "!l.verify()");
+  assert.ok(!l.verify(null), "!l.verify(null)");
+  assert.ok(!l.verify({}), "!l.verify({})");
+  assert.ok(!l.verify({data:{version:null}}), "!l.verify(fakeObj)");
+  testCount += 10;
   levels.forEach(function (lvl) {
     assert.ok(l.get(lvl) instanceof Function, "l.get('" + lvl + "') returns a function");
     testCount += 1;
