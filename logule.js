@@ -6,10 +6,9 @@ var c = require('colors')
   , noop = function () {}
   , version = require('./package').version;
 
-
 // Levels and their log output delimiter color fn
 var levelMaps = {
-  'zalgo' : c.zalgo
+  'zalgo' : function (str) { return c.magenta(c.zalgo(str)); }
 , 'error' : c.red
 , 'warn'  : c.yellow
 , 'info'  : c.green
