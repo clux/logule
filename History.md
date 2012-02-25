@@ -5,6 +5,7 @@
   * .line() gets the line number from new Error()'s 1st stack frame directly rather than by parsing
   * .lock() instance method removed - prefer evars for proper filtering rather than encouraging avoiding the tree
   * removed makeMiddleware instance method and put it in the example folder instead
+  * node 0.4 support is removed
 
 0.5.6 / 2012-01-12
 ==================
