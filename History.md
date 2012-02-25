@@ -1,3 +1,10 @@
+0.6.1 / 2012-02-25
+==================
+  * 0.4 support removed was not strictly metioned in 0.6 pre launch
+  but it does affect it, so minor version increase
+  * Slight zalgo style tweak
+  * Bump dependencies' versions
+
 0.6.0 / 2012-02-25
 ==================
   * Redesign pass around interface to be simpler for people who do not want to use DI all the time:
