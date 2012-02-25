@@ -163,7 +163,7 @@ Alternatively, if you want to primarily allow only a few methods rather than
 list all the ones you want to disallow, you can set the LOGULE_ALLOW environment
 variable instead.
 
-    $ export LOGULE_ALLOW=ERROR,WARN
+    $ export LOGULE_ALLOW=error,warn
 
 This will hide all output from any othes methods than `warn()` and `error()`.
 
