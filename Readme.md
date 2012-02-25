@@ -73,7 +73,7 @@ log.line('and now?');
 ![line output!](https://github.com/clux/logule/raw/master/imgs/line.png)
 
 ## Passing log around
-### Dependency Injections
+### Dependency Injection
 #### Subclasses
 A good use of `.sub()` involve inheriting based on namespaces, and linking
 instances together.

@@ -189,6 +189,23 @@ exports["test stdout"] = function () {
     testCount += 4;
   });
 
+  // check if LOGULE_SUPPRESS evar does not give output
+  process.env.LOGULE_SUPPRESS  = 'zalgo,line,warn';
+  levels.forEach(function (lvl) {
+
+  });
+
+  delete process.env.LOGULE_SUPPRESS;
+  // check if LOGULE_ALLOW evar allows only complement to output
+  process.env.LOGULE_ALLOW = 'info,warn,error';
+  levels.forEach(function (lvl) {
+
+  });
+
+  delete process.env.LOGULE_ALLOW;
+
+
+
   unhook();
   log("stdout - completed", testCount);
 };
