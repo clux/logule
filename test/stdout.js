@@ -81,6 +81,18 @@ exports["test stdout"] = function () {
     testCount += 2;
   });
 
+  // but re-allowed ones will
+  levels.forEach(function (lvl) {
+    var stdsub = stdlog.sub('supandallow').suppress(lvl)
+      , lastOut = last();
+    stdsub[lvl]('i am suppressed');
+    assert.equal(lastOut, last(), "suppresed message ignored for " + lvl);
+    stdsub.allow(lvl);
+    stdsub[lvl]('i am resurrected');
+    assert.notEqual(lastOut, last(), "ressurrected method logs " + lvl + "again");
+    lastOut = last(); // save new lastOut for later
+  });
+
   // suppressing a level does not affect other levels
   levels.forEach(function (lvl) {
     var stdsub = stdlog.sub('SEMI').suppress(lvl);

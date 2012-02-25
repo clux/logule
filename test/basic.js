@@ -4,7 +4,15 @@ var logule = require('../')
   , l = logule.sub('suppressed').suppress.apply({}, levels)
   , log = logule.sub('LOGULE').get('info')
   , privates = ['internal', 'log', 'namespaces', 'size', 'removed']
-  , pubs = ['get', 'suppress', 'sub', 'pad', 'makeMiddleware', 'verify', 'data'];
+  , pubs = [
+    'get'
+  , 'suppress'
+  , 'sub'
+  , 'pad'
+  , 'verify'
+  , 'data'
+  , 'allow'
+  ];
 
 exports["test chaining"] = function () {
   levels.forEach(function (lvl) {

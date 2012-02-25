@@ -4,17 +4,18 @@ var c = require('colors')
   , semver = require('semver')
   , slice = Array.prototype.slice
   , noop = function () {}
-  , version = JSON.parse(fs.readFileSync(path.join(__dirname, 'package.json'), 'utf8')).version;
+  , version = require('./package').version;
+
 
 // Levels and their log output delimiter color fn
 var levelMaps = {
-  'error' : c.red
+  'zalgo' : c.zalgo
+, 'error' : c.red
 , 'warn'  : c.yellow
 , 'info'  : c.green
+, 'line'  : c.bold
 , 'debug' : c.cyan
 , 'trace' : c.grey
-, 'zalgo' : c.zalgo
-, 'line'  : c.bold
 };
 var levels = Object.keys(levelMaps);
 
@@ -30,6 +31,33 @@ function pad(str, len) {
   } else {
     return str;
   }
+}
+
+// environment based filtering
+var globallyOff = [];
+if (process.env.LOGULE_SUPPRESS) {
+  globallyOff = process.env.LOGULE_SUPPRESS.split(',');
+}
+else if (process.env.LOGULE_ALLOW) {
+  levels.forEach(function (e) {
+    globallyOff.push(e);
+  });
+  process.env.LOGULE_ALLOW.split(',').forEach(function (a) {
+    delete globallyOff[globallyOff.indexOf(a)];
+  });
+}
+
+// callsite helper
+function getStack() {
+  var orig = Error.prepareStackTrace;
+  Error.prepareStackTrace = function (err, stack) {
+    return stack;
+  };
+  var err = new Error;
+  Error.captureStackTrace(err, arguments.callee);
+  var stack = err.stack;
+  Error.prepareStackTrace = orig;
+  return stack;
 }
 
 // Constructor helper
@@ -71,6 +99,10 @@ function Logger() {
       , delim = levelMaps[lvl]('-')
       , level = pad(lvl, max_lvl).toUpperCase();
 
+    if (removed.indexOf(lvl) >= 0 || globallyOff.indexOf(lvl) >= 0) {
+      return that;
+    }
+
     var end = namespaces.reduce(function (acc, ns) {
       return acc.concat([c.blue(c.bold(pad(ns + '', size))), delim]);
     }, []);
@@ -100,12 +132,8 @@ function Logger() {
 
   // Generate line logger
   this.line = function () {
-    // Get caller file and line number from stack
-    var e = new Error().stack.split('\n')[2].split(':')
-      , line = e[1]
-      , file = (module === require.main) ? 'main' : e[0].split('/').slice(-1)[0];
-
-    namespaces.push(file + ":" + line);
+    var frame = getStack()[1];
+    namespaces.push(frame.getFileName() + ":" + frame.getLineNumber());
     var c = log.apply(that, ['line'].concat(arguments.length > 0 ? slice.call(arguments, 0) : []));
     namespaces.pop();
     return c;
@@ -118,23 +146,34 @@ function Logger() {
   };
 
   // Suppress logs for specified levels
-  // Method is cumulative across subs/gets
+  // Method is cumulative across new subs/gets
   this.suppress = function () {
     var fns = (arguments.length > 0) ? slice.call(arguments, 0) : [];
 
     fns.forEach(function (fn) {
       if (levels.indexOf(fn) < 0) {
-        return internal().warn('Invalid Logule::suppress call for non-method: ' + fn);
+        internal().warn('Invalid Logule::suppress call for non-method: ' + fn);
       }
-      that[fn] = function () {
-        return that;
-      };
     });
 
     removed = removed.concat(fns).filter(function (e, i, ary) {
       return ary.indexOf(e, i + 1) < 0;
     });
 
+    return that;
+  };
+
+  // Allow logs for specific levels
+  // Method is cumulative across new subs/gets
+  this.allow = function () {
+    var fns = (arguments.length > 0) ? slice.call(arguments, 0) : [];
+
+    fns.forEach(function (fn) {
+      var remIdx = removed.indexOf(fn);
+      if (remIdx >= 0) {
+        removed.splice(remIdx, 1);
+      }
+    })
     return that;
   };
 
@@ -165,17 +204,6 @@ function Logger() {
   };
 }
 
-// Simple Express Middleware Factory
-// Inherits from current logger
-Logger.prototype.makeMiddleware = function (expressPrefix) {
-  var log = this.sub(expressPrefix);
-
-  return function (req, res, next) {
-    log.trace(req.method, req.url.toString());
-    next();
-  };
-};
-
 // Verify that an instance is an up to date Logger instance
 Logger.prototype.verify = function (inst) {
   if (!inst || !inst.data || !inst.data.version) {
@@ -186,5 +214,4 @@ Logger.prototype.verify = function (inst) {
 };
 
 // Expose an instance of Logger
-// Limits API to log methods + get, suppress and sub for passing around
 module.exports = new Logger();

@@ -1,3 +1,17 @@
+0.6.0 / 2012-02-25
+==================
+  * Redesign pass around interface to be simpler for people who do not want to use DI all the time:
+  * Global log levels via environment variables - see readme
+  * .line() gets the line number from new Error()'s 1st stack frame directly rather than by parsing
+  * .lock() instance method removed - prefer evars for proper filtering rather than encouraging avoiding the tree
+  * removed makeMiddleware instance method and put it in the example folder instead
+
+0.5.6 / 2012-01-12
+==================
+  * New instance method .allow() does the opposite of suppress.
+  This ensures the more sensible behaviour of ressurection allowed across subs,
+  rather than forcing modules below to use instances not part of the chain.
+
 0.5.5 / 2011-12-14
 ==================
   * Slight tweak to verifier (could not handle null elements before this version)
