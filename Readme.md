@@ -6,7 +6,7 @@ the current time, the log level, and optionally, prefixed namespaces
 (with optional padding).
 
 Shortcut methods for the log levels are available as: `log.error`, `log.warn`,
-`log.info`, `log.debug`, `log.trace`, `log.line`, `log.zalgo`, and as a bonus,
+`log.info`, `log.debug`, `log.trace`, `log.zalgo`, and as a bonus,
 `log.line`. These methods are additionally chainable.
 
 It favours a combination of Dependency Injection and environment variable based
