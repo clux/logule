@@ -24,6 +24,6 @@
   "bugs": {
     "url": "http://github.com/clux/logule/issues"
   },
-  "licence": "MIT",
+  "license": "MIT",
   "optionalDependencies": {}
 }
