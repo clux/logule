@@ -1,3 +1,7 @@
+0.6.2 / 2012-06-25
+==================
+  * 0.8 test support by ditching expresso for tap
+
 0.6.1 / 2012-02-25
 ==================
   * 0.4 support removed was not strictly metioned in 0.6 pre launch
