@@ -1,7 +1,7 @@
 {
   "author": "Eirik Albrigtsen <analsandblaster@gmail.com>",
   "name": "logule",
-  "description": "An advanced logger for nodejs",
+  "description": "An advanced console logging library",
   "version": "0.6.1",
   "repository": {
     "type": "git",
@@ -12,17 +12,18 @@
     "node": ">=0.6.0"
   },
   "scripts": {
-    "test": "expresso"
+    "test": "tap ./test"
   },
   "dependencies": {
     "colors": "~0.5.1",
     "semver": "~1.0.13"
   },
   "devDependencies": {
-    "expresso": "~0.9.2"
+    "tap": "~0.2.5"
   },
   "bugs": {
     "url": "http://github.com/clux/logule/issues"
   },
+  "licence": "MIT",
   "optionalDependencies": {}
 }

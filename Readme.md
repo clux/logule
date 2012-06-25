@@ -83,13 +83,13 @@ var log = logule.sub('BUILD');
 var sublog = log.sub('COMPILE');
 ````
 
-`sublog` would here provide same output as `logule.sub('BUILD', 'COMPILE')`.
+Here `sublog` would provide same output as `logule.sub('BUILD', 'COMPILE')`.
 
 It is advantageous to do 'one namespace sub at a time', as then it is easier
 to filter log output from large chunks of code at a time,
 as well as maintaining a sensible log hierarchy.
 
-`log.sub()` maintains all padding, suppressed log levels, its locked status,
+A `log.sub()` maintains all padding, suppressed log levels, its locked status,
 and namespace properties set on the original `log` instance. Therefore, it works as if there's
 an implicit link between the sub and its parent.
 
@@ -163,7 +163,9 @@ Alternatively, if you want to primarily allow only a few methods rather than
 list all the ones you want to disallow, you can set the LOGULE_ALLOW environment
 variable instead.
 
-    $ export LOGULE_ALLOW=error,warn
+````bash
+$ export LOGULE_ALLOW=error,warn
+````
 
 This will hide all output from any othes methods than `warn()` and `error()`.
 
