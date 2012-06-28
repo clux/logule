@@ -2,13 +2,17 @@ var c = require('colors')
   , fs = require('fs')
   , path = require('path')
   , semver = require('semver')
+  , $ = require('subset')
+  , version = require('./package').version
   , slice = Array.prototype.slice
-  , noop = function () {}
-  , version = require('./package').version;
+  , concat = Array.prototype.concat
+  , noop = function () {};
 
 // Levels and their log output delimiter color fn
 var levelMaps = {
-  'zalgo' : function (str) { return c.magenta(c.zalgo(str)); }
+  'zalgo' : function (str) {
+    return c.magenta(c.zalgo(str));
+  }
 , 'error' : c.red
 , 'warn'  : c.yellow
 , 'info'  : c.green
@@ -24,13 +28,9 @@ var max_lvl = Math.max.apply({}, levels.map(function (l) {
 }));
 
 // Pads a str to a str of length len
-function pad(str, len) {
-  if (str.length < len) {
-    return str + new Array(len - str.length + 1).join(' ');
-  } else {
-    return str;
-  }
-}
+var pad = function (str, len) {
+  return (str.length < len) ? str + new Array(len - str.length + 1).join(' ') : str;
+};
 
 // environment based filtering
 var globallyOff = [];
@@ -38,178 +38,164 @@ if (process.env.LOGULE_SUPPRESS) {
   globallyOff = process.env.LOGULE_SUPPRESS.split(',');
 }
 else if (process.env.LOGULE_ALLOW) {
-  levels.forEach(function (e) {
-    globallyOff.push(e);
-  });
-  process.env.LOGULE_ALLOW.split(',').forEach(function (a) {
-    delete globallyOff[globallyOff.indexOf(a)];
-  });
+  globallyOff = $.difference(levels, process.env.LOGULE_ALLOW.split(','));
 }
 
 // callsite helper
-function getStack() {
+var getStack = function () {
   var orig = Error.prepareStackTrace;
   Error.prepareStackTrace = function (err, stack) {
     return stack;
   };
-  var err = new Error;
+  var err = new Error();
   Error.captureStackTrace(err, arguments.callee);
   var stack = err.stack;
   Error.prepareStackTrace = orig;
   return stack;
-}
+};
 
 // Constructor helper
-function construct(Ctor, args) {
+var construct = function (Ctor, args) {
   var F = function () {
     Ctor.apply(this, args);
   };
   F.prototype = Ctor.prototype;
   return new F();
-}
+};
 
 // Logger class
 function Logger() {
-  // TODO: ES6 name objects for these so we can move stuff out of Ctor
-  var namespaces = (arguments.length > 0) ? slice.call(arguments, 0) : []
-    , size = 0
-    , removed = []
-    , that = this;
+  // internal vars TODO: not writable/readable
+  this.size = 0;
+  this.removed = []; // this never contains duplicates, so can use efficient set ops
 
-  // Expose inspectable info
-  this.data = {
-    version   : version
-  , namespaces: namespaces
-  };
+  // TODO: these should NOT be writable
+  this.version = version;
+  this.namespaces = (arguments.length > 0) ? slice.call(arguments, 0) : [];
 
-  // But dont allow it to be modified
-  Object.freeze(this.data);
+  // TODO: Object.defineProperty on this!
+}
 
-  // Internal error logger
-  // returns a new Logger with one extra namespace, but can log despite filters
-  function internal() {
-    return construct(Logger, namespaces.concat(['logule'])).pad(size);
+
+// Internal error logger
+// returns a new Logger with one extra namespace, can log despite filters
+Logger.prototype.internal = function () {
+  return construct(Logger, this.namespaces.concat('logule')).pad(this.size);
+};
+
+// Logger base method
+Logger.prototype.log = function (lvl) {
+  var args = (arguments.length > 1) ? slice.call(arguments, 1) : []
+    , delim = levelMaps[lvl]('-')
+    , level = pad(lvl, max_lvl).toUpperCase();
+
+  if (this.removed.indexOf(lvl) >= 0 || globallyOff.indexOf(lvl) >= 0) {
+    return this;
   }
 
-  // Logger base method
-  function log() {
-    var lvl = arguments[0]
-      , args = (arguments.length > 1) ? slice.call(arguments, 1) : []
-      , delim = levelMaps[lvl]('-')
-      , level = pad(lvl, max_lvl).toUpperCase();
+  var ns = this.namespaces.reduce(function (acc, ns) {
+    return acc.concat([c.blue(c.bold(pad(ns + '', this.size))), delim]);
+  }, []);
 
-    if (removed.indexOf(lvl) >= 0 || globallyOff.indexOf(lvl) >= 0) {
-      return that;
-    }
+   console.log.apply(console, [
+    c.grey(new Date().toLocaleTimeString())
+  , delim
+  , (lvl === 'error') ? c.bold(level) : level
+  , delim
+  ].concat(ns, args));
 
-    var end = namespaces.reduce(function (acc, ns) {
-      return acc.concat([c.blue(c.bold(pad(ns + '', size))), delim]);
-    }, []);
+  return this;
+};
 
-    console.log.apply(console, [
-      c.grey(new Date().toLocaleTimeString())
-    , delim
-    , (lvl === 'error') ? c.bold(level) : level
-    , delim
-    ].concat(end, args));
 
-    return that;
+// Public methods
+
+// Return a single Logger helper method
+Logger.prototype.get = function (fn) {
+  if (levels.indexOf(fn) < 0) {
+    this.internal().error('Invalid Logule::get call for non-method: ' + fn);
   }
+  else if (this.removed.indexOf(fn) < 0) {
+    var that = this
+      , l = this.sub();
+    // not necessary to suppress l as .get never chains
+    // l.suppress.apply(l, $.delete(levels.slice(), fn));
 
-  // Public methods
-
-  // Generate one helper method per specified level
-  levels.forEach(function (name) {
-    if (name === 'line') {
-      return;
-    }
-    that[name] = function () {
-      var args = (arguments.length > 0) ? slice.call(arguments, 0) : [];
-      return log.apply(that, [name].concat(args));
-    };
-  });
-
-  // Generate line logger
-  this.line = function () {
-    var frame = getStack()[1];
-    namespaces.push(frame.getFileName() + ":" + frame.getLineNumber());
-    var c = log.apply(that, ['line'].concat(arguments.length > 0 ? slice.call(arguments, 0) : []));
-    namespaces.pop();
-    return c;
-  };
-
-  // Set the padding to size s
-  this.pad = function (s) {
-    size = s | 0;
-    return that;
-  };
-
-  // Suppress logs for specified levels
-  // Method is cumulative across new subs/gets
-  this.suppress = function () {
-    var fns = (arguments.length > 0) ? slice.call(arguments, 0) : [];
-
-    fns.forEach(function (fn) {
-      if (levels.indexOf(fn) < 0) {
-        internal().warn('Invalid Logule::suppress call for non-method: ' + fn);
-      }
-    });
-
-    removed = removed.concat(fns).filter(function (e, i, ary) {
-      return ary.indexOf(e, i + 1) < 0;
-    });
-
-    return that;
-  };
-
-  // Allow logs for specific levels
-  // Method is cumulative across new subs/gets
-  this.allow = function () {
-    var fns = (arguments.length > 0) ? slice.call(arguments, 0) : [];
-
-    fns.forEach(function (fn) {
-      var remIdx = removed.indexOf(fn);
-      if (remIdx >= 0) {
-        removed.splice(remIdx, 1);
-      }
-    })
-    return that;
-  };
-
-  // Subclass from a pre-configured Logger class to get extra namespace(s)
-  this.sub = function () {
-    var subns = (arguments.length > 0) ? slice.call(arguments, 0) : [];
-    return construct(Logger, namespaces.concat(subns)).pad(size).suppress.apply({}, removed);
-  };
-
-  // Return a single Logger helper method
-  this.get = function (fn) {
-    if (levels.indexOf(fn) < 0) {
-      internal().error('Invalid Logule::get call for non-method: ' + fn);
-    }
-    else if (removed.indexOf(fn) < 0) {
-      var l = that.sub().suppress.apply({}, levels);
-
-      if (fn === 'line') {
-        return function () {
-          that.line.apply(l, (arguments.length > 0) ? slice.call(arguments, 0) : []);
-        };
-      }
+    if (fn === 'line') {
       return function () {
-        log.apply(l, [fn].concat((arguments.length > 0) ? slice.call(arguments, 0) : []));
+        that.line.apply(l, arguments);
       };
     }
-    return noop;
-  };
-}
+    return function () {
+      that.log.apply(l, concat.apply([fn], arguments));
+    };
+  }
+  return noop;
+};
+
+// Generate one helper method per specified level
+levels.forEach(function (name) {
+  if (name !== 'line') {
+    Logger.prototype[name] = function () {
+      return this.log.apply(this, concat.apply([name], arguments));
+    };
+  }
+});
+
+// Generate line logger
+Logger.prototype.line = function () {
+  var frame = getStack()[1];
+  this.namespaces.push(frame.getFileName() + ":" + frame.getLineNumber());
+  var c = this.log.apply(this, concat.apply(['line'], arguments));
+  this.namespaces.pop();
+  return c;
+};
+
+// Set the padding to size s
+Logger.prototype.pad = function (s) {
+  this.size = s | 0;
+  return this;
+};
+
+// Suppress logs for specified levels
+// Method is cumulative across new subs/gets
+Logger.prototype.suppress = function () {
+  var fns = arguments.length > 0 ? slice.call(arguments, 0) : []
+    , internal = this.internal;
+
+  fns.forEach(function (fn) {
+    if (levels.indexOf(fn) < 0) {
+      internal().warn('Invalid Logule::suppress call for non-method: ' + fn);
+    }
+  });
+  this.removed = $.union(this.removed, fns);
+  return this;
+};
+
+
+// Allow logs for specific levels
+// Method is cumulative across new subs/gets
+Logger.prototype.allow = function () {
+  var fns = (arguments.length > 0) ? slice.call(arguments, 0) : [];
+  this.removed = $.difference(this.removed, fns);
+  return this;
+};
+
+// Subclass from a pre-configured Logger class to get extra namespace(s)
+Logger.prototype.sub = function () {
+  var sub = construct(Logger, concat.apply(this.namespaces, arguments));
+  sub.pad(this.size).suppress.apply(sub, this.removed);
+  return sub;
+};
+
 
 // Verify that an instance is an up to date Logger instance
 Logger.prototype.verify = function (inst) {
-  if (!inst || !inst.data || !inst.data.version) {
+  if (!inst || !inst.version) {
     return false;
   }
   // inst.version only varies by patch number positively
-  return semver.satisfies(inst.data.version, "~" + this.data.version);
+  return semver.satisfies(inst.version, "~" + this.version);
 };
 
 // Expose an instance of Logger

@@ -1,9 +1,10 @@
 var logule = require('../')
   , test   = require('tap').test
   , levels = ['trace', 'debug', 'info', 'warn', 'error', 'zalgo', 'line']
-  , l = logule.sub('suppressed').suppress.apply({}, levels)
   , log = logule.sub('LOGULE').get('info')
-  , testMsg = "this is a test message";
+  , testMsg = "this is a test message"
+  , l = logule.sub('suppressed');
+l.suppress.apply(l, levels);
 
 // monkey-patch process.stdout to intercept its messages
 function hook(cb) {
