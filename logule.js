@@ -1,29 +1,29 @@
 var c = require('colors')
+  , $ = require('subset')
   , fs = require('fs')
   , path = require('path')
   , semver = require('semver')
-  , $ = require('subset')
   , version = require('./package').version
+  , noop = function () {}
   , slice = Array.prototype.slice
-  , concat = Array.prototype.concat
-  , noop = function () {};
+  , concat = Array.prototype.concat;
 
 // Levels and their log output delimiter color fn
 var levelMaps = {
-  'zalgo' : function (str) {
+  zalgo : function (str) {
     return c.magenta(c.zalgo(str));
   }
-, 'error' : c.red
-, 'warn'  : c.yellow
-, 'info'  : c.green
-, 'line'  : c.bold
-, 'debug' : c.cyan
-, 'trace' : c.grey
+, error : c.red
+, warn  : c.yellow
+, info  : c.green
+, line  : c.bold
+, debug : c.cyan
+, trace : c.grey
 };
 var levels = Object.keys(levelMaps);
 
 // Maximum level length
-var max_lvl = Math.max.apply({}, levels.map(function (l) {
+var max_lvl = Math.max.apply(Math, levels.map(function (l) {
   return l.length;
 }));
 
@@ -54,37 +54,29 @@ var getStack = function () {
   return stack;
 };
 
-// Constructor helper
-var construct = function (Ctor, args) {
-  var F = function () {
-    Ctor.apply(this, args);
-  };
-  F.prototype = Ctor.prototype;
-  return new F();
-};
-
 // Logger class
-function Logger() {
-  // internal vars TODO: not writable/readable
-  this.size = 0;
-  this.removed = []; // this never contains duplicates, so can use efficient set ops
+var Logger = function () {};
 
-  // TODO: these should NOT be writable
-  this.version = version;
-  this.namespaces = (arguments.length > 0) ? slice.call(arguments, 0) : [];
-
-  // TODO: Object.defineProperty on this!
-}
-
-
-// Internal error logger
-// returns a new Logger with one extra namespace, can log despite filters
-Logger.prototype.internal = function () {
-  return construct(Logger, this.namespaces.concat('logule')).pad(this.size);
+// instance defaults
+var defaults = {
+  version : version
+, removed : []
+, size : 0
+, namespaces : []
 };
+
+// make undeletable instance defaults up the prototype chain
+Object.keys(defaults).forEach(function (key) {
+  Object.defineProperty(Logger.prototype, key, {
+    value : defaults[key]
+  , writable : false
+  , enumerable : false
+  , configurable : false
+  });
+});
 
 // Logger base method
-Logger.prototype.log = function (lvl) {
+Logger.prototype._log = function (lvl) {
   var args = (arguments.length > 1) ? slice.call(arguments, 1) : []
     , delim = levelMaps[lvl]('-')
     , level = pad(lvl, max_lvl).toUpperCase();
@@ -93,11 +85,11 @@ Logger.prototype.log = function (lvl) {
     return this;
   }
 
-  var ns = this.namespaces.reduce(function (acc, ns) {
-    return acc.concat([c.blue(c.bold(pad(ns + '', this.size))), delim]);
-  }, []);
+  var ns = this.namespaces.map(function (n) {
+    return c.blue(c.bold(pad(n + '', this.size))) + delim;
+  });
 
-   console.log.apply(console, [
+  console.log.apply(console, [
     c.grey(new Date().toLocaleTimeString())
   , delim
   , (lvl === 'error') ? c.bold(level) : level
@@ -107,19 +99,18 @@ Logger.prototype.log = function (lvl) {
   return this;
 };
 
-
 // Public methods
 
 // Return a single Logger helper method
 Logger.prototype.get = function (fn) {
   if (levels.indexOf(fn) < 0) {
-    this.internal().error('Invalid Logule::get call for non-method: ' + fn);
+    this.namespaces.push('logule');
+    this.error('Invalid Logule::get call for non-method: ' + fn);
+    this.namespaces.pop();
   }
   else if (this.removed.indexOf(fn) < 0) {
     var that = this
       , l = this.sub();
-    // not necessary to suppress l as .get never chains
-    // l.suppress.apply(l, $.delete(levels.slice(), fn));
 
     if (fn === 'line') {
       return function () {
@@ -127,7 +118,7 @@ Logger.prototype.get = function (fn) {
       };
     }
     return function () {
-      that.log.apply(l, concat.apply([fn], arguments));
+      that._log.apply(l, concat.apply([fn], arguments));
     };
   }
   return noop;
@@ -137,18 +128,18 @@ Logger.prototype.get = function (fn) {
 levels.forEach(function (name) {
   if (name !== 'line') {
     Logger.prototype[name] = function () {
-      return this.log.apply(this, concat.apply([name], arguments));
+      return this._log.apply(this, concat.apply([name], arguments));
     };
   }
 });
 
-// Generate line logger
+// Generate line logger separately
 Logger.prototype.line = function () {
   var frame = getStack()[1];
   this.namespaces.push(frame.getFileName() + ":" + frame.getLineNumber());
-  var c = this.log.apply(this, concat.apply(['line'], arguments));
+  this._log.apply(this, concat.apply(['line'], arguments));
   this.namespaces.pop();
-  return c;
+  return this;
 };
 
 // Set the padding to size s
@@ -160,15 +151,9 @@ Logger.prototype.pad = function (s) {
 // Suppress logs for specified levels
 // Method is cumulative across new subs/gets
 Logger.prototype.suppress = function () {
-  var fns = arguments.length > 0 ? slice.call(arguments, 0) : []
-    , internal = this.internal;
-
-  fns.forEach(function (fn) {
-    if (levels.indexOf(fn) < 0) {
-      internal().warn('Invalid Logule::suppress call for non-method: ' + fn);
-    }
-  });
-  this.removed = $.union(this.removed, fns);
+  if (arguments.length) {
+    this.removed = $.union(this.removed, slice.call(arguments, 0));
+  }
   return this;
 };
 
@@ -176,27 +161,31 @@ Logger.prototype.suppress = function () {
 // Allow logs for specific levels
 // Method is cumulative across new subs/gets
 Logger.prototype.allow = function () {
-  var fns = (arguments.length > 0) ? slice.call(arguments, 0) : [];
-  this.removed = $.difference(this.removed, fns);
+  if (arguments.length) {
+    this.removed = $.difference(this.removed, slice.call(arguments, 0));
+  }
   return this;
 };
 
 // Subclass from a pre-configured Logger class to get extra namespace(s)
 Logger.prototype.sub = function () {
-  var sub = construct(Logger, concat.apply(this.namespaces, arguments));
-  sub.pad(this.size).suppress.apply(sub, this.removed);
+  var sub = Object.create(this);
+  sub.namespaces = concat.apply(this.namespaces, arguments);
   return sub;
 };
 
 
 // Verify that an instance is an up to date Logger instance
 Logger.prototype.verify = function (inst) {
-  if (!inst || !inst.version) {
+  if (!inst || !(inst instanceof Logger)) {
     return false;
   }
   // inst.version only varies by patch number positively
-  return semver.satisfies(inst.version, "~" + this.version);
+  return semver.satisfies(inst.constructor.prototype.version, "~" + version);
 };
 
-// Expose an instance of Logger
+// Prevent hacky prototype modifications via l.constructor.prototype
+Object.freeze(Logger.prototype);
+
+// Expose a root instance of Logger
 module.exports = new Logger();

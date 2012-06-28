@@ -1,18 +1,9 @@
 var logule = require('../')
   , test   = require('tap').test
   , levels = ['trace', 'debug', 'info', 'warn', 'error', 'zalgo', 'line']
-  , l = logule.sub('suppressed') // suppressed later
-  , log = logule.sub('LOGULE').get('info')
-  , privates = ['internal', 'log', 'namespaces', 'size', 'removed']
-  , pubs = [
-    'get'
-  , 'suppress'
-  , 'sub'
-  , 'pad'
-  , 'verify'
-  , 'allow'
-  ];
-l.suppress.apply(l, levels);
+  , pubs = ['get', 'suppress', 'allow', 'sub', 'pad', 'verify']
+  , l = logule.sub('suppressed');
+l.suppress.apply(l, levels); // l is always suppressed
 
 test("chaining", function (t) {
   levels.forEach(function (lvl) {
@@ -26,14 +17,6 @@ test("chaining", function (t) {
   t.end();
 });
 
-
-/*
-test("encapsulation", function (t) {
-  privates.forEach(function (p) {
-    t.equal(l[p], undefined, 'l.' + p + ' is encapsulated');
-  });
-  t.end();
-});
 
 test("exports", function (t) {
   var expectedExports = levels.concat(pubs);
@@ -52,13 +35,9 @@ test("exports", function (t) {
     t.ok(fn() === undefined, "l.get('" + lvl + "')() returns undefined");
   });
 
-  Object.keys(l).forEach(function (exprt) {
-    var val = l[exprt];
-    t.ok(expectedExports.indexOf(exprt) >= 0, "l exported key " + exprt + " is either a log convenience or one of the public functions");
-  });
   t.end();
 });
-*/
+
 
 test("verify", function (t) {
   t.ok(logule.verify(logule), "logule.verify(logule) is logule");

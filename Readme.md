@@ -11,7 +11,7 @@ Shortcut methods for the log levels are available as: `log.error`, `log.warn`,
 
 It favours a combination of Dependency Injection and environment variable based
 control to allow for both tree-based log level filtration (via DI),
-and globally controllable log levels (via evars).
+and globally controllable log levels (via env-vars).
 
 ## Usage
 Basic usage:
@@ -184,9 +184,11 @@ has a version compatible with the module's own using a built in helper function.
 
 ````javascript
 var logule = require('logule');
-function (logInput) {
-  if (logule.verify(logInput)) {
-    // logInput exists, is an instance of logule, and its version is ~logule.data.version
+function (injectedLogule) {
+  if (logule.verify(injectedLogule)) {
+    // injectedLogule exists, and its version is ~ to the module's own
+  } else {
+    // injectedLogule invalid or out of date: use logule
   }
 }
 ````

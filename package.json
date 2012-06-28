@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "colors": "~0.5.1",
+    "subset": "~0.1.0",
     "semver": "~1.0.13"
   },
   "devDependencies": {

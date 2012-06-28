@@ -1,3 +1,12 @@
+TODO
+==================
+  * Write a serious .logule.json config file
+
+0.7.0 / 2012-06-??
+==================
+  * Rewrite from prototype as object to loosely coupled individual methods
+  * Performance and memory usage improvement as a result thereof
+
 0.6.2 / 2012-06-25
 ==================
   * 0.8 test support by ditching expresso for tap
@@ -5,7 +14,7 @@
 0.6.1 / 2012-02-25
 ==================
   * 0.4 support removed was not strictly metioned in 0.6 pre launch
-  but it does affect it, so minor version increase
+  but it does aSeals an object, preventing new properties from being added to it and marking all existing properties as non-configurable. Values of present properties can still be changed as long as they are writable.ffect it, so minor version increase
   * Slight zalgo style tweak
   * Bump dependencies' versions
 
