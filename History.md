@@ -2,10 +2,12 @@ TODO
 ==================
   * Write a serious .logule.json config file
 
-0.7.0 / 2012-06-??
+0.7.0 / 2012-06-30
 ==================
   * Rewrite from prototype as object to loosely coupled individual methods
   * Performance and memory usage improvement as a result thereof
+  * configuration now possible via recusively placed .logule files
+  * environment variable based suppression taken out in favour of config files
 
 0.6.2 / 2012-06-25
 ==================
@@ -13,8 +15,7 @@ TODO
 
 0.6.1 / 2012-02-25
 ==================
-  * 0.4 support removed was not strictly metioned in 0.6 pre launch
-  but it does aSeals an object, preventing new properties from being added to it and marking all existing properties as non-configurable. Values of present properties can still be changed as long as they are writable.ffect it, so minor version increase
+  * 0.4 support removed was not strictly metioned in 0.6 pre launch but it does affect so minor bump
   * Slight zalgo style tweak
   * Bump dependencies' versions
 

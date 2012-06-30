@@ -1,17 +1,12 @@
 # Logule [![Build Status](https://secure.travis-ci.org/clux/logule.png)](http://travis-ci.org/clux/logule)
 
-Logule is an advanced logging utility for nodejs. It is analogous to `console.log`
-and can take multiple arguments, but additionally it prefixes
-the current time, the log level, and optionally, prefixed namespaces
-(with optional padding).
+Logule is a heavily configurable logging utility for nodejs. It is analogous to `console.log` and can take multiple arguments, but additionally it prefixes the current time, the log level, and optionally, prefixed namespaces (with optional padding).
 
-Shortcut methods for the log levels are available as: `log.error`, `log.warn`,
-`log.info`, `log.debug`, `log.trace`, `log.zalgo`, and as a bonus,
-`log.line`. These methods are additionally chainable.
+Shortcut methods for the log levels are available as (by default): `log.error`, `log.warn`, `log.info`, `log.debug`, `log.trace`, `log.zalgo`, and as a bonus, `log.line`. These methods are additionally chainable.
 
 It favours a combination of Dependency Injection and environment variable based
 control to allow for both tree-based log level filtration (via DI),
-and globally controllable log levels (via env-vars).
+and globally controllable log levels (via config files).
 
 ## Usage
 Basic usage:
@@ -151,28 +146,24 @@ var eventsLog = modelsLog.sub('EVENT'); // pass this down from models to events
 Tree based log levels is the safe, overridable version of log levels.
 To strictly enforce suppression of certain levels, use environment variables.
 
-### Global Log Levels
-To globally filter log levels, set the LOGULE_SUPPRESS environment variable.
+## Configuration
+Since logule >= 0.7, rich configuration of colors, style, date formatting and global suppression of certain log levels is available. The [default configuration file](https://github.com/clux/logule/blob/master/.logule) results in output looking like the older versions.
 
-    $ export LOGULE_SUPPRESS=debug,trace,line
+When starting a node script requiring logule, logule will search from the execution directory for a `.logule` file. If that fails, it will keep searching one directory up until $HOME is hit.
 
-This will globally override suppress/allow calls for any branch regarding
-`debug()`, `trace()` and `line()` and hide all of their outputs.
+If no config is found, or it is incomplete, the default one in this directory will be used, or merged with the found one respectively.
 
-Alternatively, if you want to primarily allow only a few methods rather than
-list all the ones you want to disallow, you can set the LOGULE_ALLOW environment
-variable instead.
+### Config Ideas
+#### Custom Prototype Log Methods
+Config files can fully specify/rename/add log methods with your own names (with two exceptions). The prototype methods created will be directly taken from the level object in the config file, and these will log with the specified color and with the same (upper cased in print) level.
 
-````bash
-$ export LOGULE_ALLOW=error,warn
-````
+The exceptions are `line` which will additionally include the file and line of callsite, and `zalgo` which has some idiosyncratic formatting. These two methods can only be removed, not renamed.
 
-This will hide all output from any othes methods than `warn()` and `error()`.
+#### Global Filtration
+Set the `suppress` flag to globally turn all listed log methods into chaining no-ops.
+If most methods listed should be disabled, quickly list the exceptions under the `allow` flag and set `useAllow` to `true`.
 
-If by any chance both environment variables are set, logule will act only
-on the LOGULE_SUPPRESS one.
-
-### Verifying Logule Validity
+## Verifying Logule Validity
 When passing logule subs around, it might be useful for separate code to test
 whether what is received is an appropriate Logule instance or not.
 Unfortunately, instanceof testing against your installed logule will only work
