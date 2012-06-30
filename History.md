@@ -8,6 +8,7 @@ TODO
   * Performance and memory usage improvement as a result thereof
   * configuration now possible via recusively placed .logule files
   * environment variable based suppression taken out in favour of config files
+  * works on 0.6 but is not tested atm because of fs.existsSync move..
 
 0.6.2 / 2012-06-25
 ==================
