@@ -1,6 +1,12 @@
 TODO
 ==================
-  * Write a serious .logule.json config file
+  * move config finder to own module
+  * proper testing of config stuff..
+
+
+0.7.1 / 2012-06-??
+==================
+  * Make backwards compatible with node 0.6 by using path.existsSync there
 
 0.7.0 / 2012-06-30
 ==================
@@ -8,7 +14,7 @@ TODO
   * Performance and memory usage improvement as a result thereof
   * configuration now possible via recusively placed .logule files
   * environment variable based suppression taken out in favour of config files
-  * works on 0.6 but is not tested atm because of fs.existsSync move..
+  * node >=0.8 only because of fs.existsSync..
 
 0.6.2 / 2012-06-25
 ==================
