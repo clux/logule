@@ -1,0 +1,53 @@
+/**
+ * Logule Config File
+ * Edit and put this file under your project's cwd to apply to all submodules within that dir.
+ * This config can be made global by placing it under $HOME
+ */
+module.exports = {
+  // delimiter to use between time, log level, namespace(s) and the message
+  delimiter : '-'
+  // Levels and their log output delimiter color-method
+, levels    : {
+    trace       : 'grey'
+  , debug       : 'cyan'
+  , info        : 'green'
+  , warn        : 'yellow'
+  , error       : 'red'
+  // special methods
+  , line        : 'bold'    // this method prepends the callsite
+  , zalgo       : 'magenta' // this method gets extra 'formatting'
+  }
+
+  // misc colors
+, prefixCol : 'blue'
+, dateCol   : 'grey'
+
+  // extra styling
+  // critical errors in bold by default
+, bold      : ['error']
+  // when including the zalgo level, what level key to use
+, zalgo     : 'Ź̩̫͎ͨ̾ͪ̂̿͢AL̡̘̥̅̅̓͒͆ͥ̽GO̥͙̫ͤͤ͊̋ͦ̍͠' // unobtrusive alternating letter zalgification default
+
+, formatting: {
+  // Date formatting type
+    dateType    : 'plain'
+    // 'plain'     -> HH:MM:SS via toLocaleTimeString
+    // 'precision' -> HH:MM:SS:MSS via toLocateTimeString + padded getMilliSeconds()
+    // 'method'    -> efficient custom via method name on Date.prototype
+    // 'custom'    -> allows a custom date string (slower)
+
+    // options for dateType case 'method'
+  , dateMethod  : 'valueOf' // perhaps try toISOString()
+
+    // opitons for dateType case 'custom'
+  , showDate    : true    // prepend year month and day numbers before the time str
+  , reverseDate : false   // reversed american DD MM YYYY or european YYYY MM DD
+  , dateDelim   : '-'     // delimiter to use for the date string when showDate
+  , showMs      : false   // append milliseconds to the time string
+  }
+
+  // global suppression
+, useAllow  : false   // if true, use 'allow' option, else use 'suppress' option
+, suppress  : []      // every method on this list is suppressed
+, allow     : []      // every method in (levels \ this list) is suppressed
+};
