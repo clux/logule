@@ -2,7 +2,7 @@
   "author": "Eirik Albrigtsen <analsandblaster@gmail.com>",
   "name": "logule",
   "description": "An advanced console logging library",
-  "version": "0.6.2",
+  "version": "0.7.0",
   "repository": {
     "type": "git",
     "url": "git://github.com/clux/logule.git"
