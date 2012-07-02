@@ -5,9 +5,15 @@ var c = require('colors')
   , path = require('path')
   , semver = require('semver')
   , version = require('./package').version
-  , defaults = require('./.logule')
+  , dotfile = require('./.logule')
   , slice = Array.prototype.slice
-  , concat = Array.prototype.concat;
+  , concat = Array.prototype.concat
+  , config = 'Default config';
+
+// Pads a str to a str of length len
+var pad = function (str, len) {
+  return (str.length < len) ? str + Array(len - str.length + 1).join(' ') : str;
+};
 
 // config searching and parsing
 var findConfig = function (name) {
@@ -34,52 +40,80 @@ var findConfig = function (name) {
   }
 };
 
-var getMergedConfig = function (name, defaults) {
-  var cfg = findConfig(name);
-  return (cfg === null) ? defaults : $.extend(defaults, require(cfg));
+var getConfig = function (name) {
+  var file = findConfig(name);
+  if (file === null) {
+    return {};
+  }
+  config = file; // store path for error msgs
+  return require(file);
 };
-
-var cfg = getMergedConfig('.logule', defaults);
 
 // applyConfig obtains these
 var levels
-  , levelMaps
-  , max_lvl
+  , delimMap
+  , levelMap
   , getDate
+  , prefixCol
   , globallyOff;
 
-var applyConfig = function (obj) {
-  var lobj = obj.levels;
+(function applyConfig() {
+  var obj = getConfig('.logule');
 
-  // export these to the outer scope
-  levels = Object.keys(lobj);
+  // extend levels on inner levels => no method removals => DI works
+  var levObj = $.extend(dotfile.levels, obj.levels || {});
 
-  levelMaps = levels.reduce(function (acc, lvl) {
-    acc[lvl] = c[lobj[lvl]];
+  // remaining cfg elements can be read from after a merge
+  var cfg = $.extend(dotfile, obj);
+
+  // cache color calls in delimMap/levelMap for _log
+  levels = Object.keys(levObj);
+  delimMap = levels.reduce(function (acc, lvl) {
+    var fn = c[levObj[lvl]];
+    if (!(fn instanceof Function)) {
+      console.error("invalid color function for level '" + lvl + "' found in " + config);
+    }
+    acc[lvl] = fn(cfg.delimiter);
     return acc;
   }, {});
 
-  max_lvl = set.maximum($.pluck('length', levels));
+  var max_lvl = set.maximum($.pluck('length', levels));
 
-  cfg.prefixCol = c[cfg.prefixCol];
-  cfg.dateCol = c[cfg.dateCol];
+  levelMap = levels.reduce(function (acc, lvl) {
+    var padded = pad(lvl === 'zalgo' ? cfg.zalgo : lvl.toUpperCase(), max_lvl);
+    acc[lvl] = (cfg.bold.indexOf(lvl) >= 0) ? c.bold(padded) : padded;
+    return acc;
+  }, {});
 
-  // make sure number is at least n (in {1, 2, 3}) chars long base 10
+  // misc colors
+  prefixCol = c[cfg.prefixCol]; // used by _log
+  var dateCol = c[cfg.dateCol]; // only used by getDate
+  if (!(prefixCol instanceof Function)) {
+    console.error("invalid color function for prefixCol found in " + config);
+  }
+  if (!(dateCol instanceof Function)) {
+    console.error("invalid color function for dateCol found in " + config);
+  }
+
+  // prepad a number with zeroes so that it's n characters long
   var prep = function (numb, n) {
-    return ("000" + numb).slice(-n);
+    return ("000" + numb).slice(-n); // works for n <= 3
   };
 
-  // get Date
-  var f = obj.formatting;
+  // highly customizable, and efficient date formatting shortcut for _log
+  var f = cfg.formatting;
   if (f.dateType === 'precision') {
     getDate = function () {
       var d = new Date();
-      return d.toLocaleTimeString() + '.' + prep(d.getMilliseconds(), 3);
+      return dateCol(d.toLocaleTimeString() + '.' + prep(d.getMilliseconds(), 3));
     };
   }
   else if (f.dateType === 'method') {
+    if (!(new Date())[f.dateMethod] instanceof Function) {
+      console.error("Logule found invalid dateMethod in " + config);
+    }
     getDate = function () {
-      return (new Date())[f.dateMethod]();
+      return dateCol((new Date())[f.dateMethod]());
     };
   }
   else if (f.dateType === 'custom') {
@@ -91,33 +125,29 @@ var applyConfig = function (obj) {
         if (f.reverseDate) {
           da = da.reverse();
         }
-        d = da.join(f.dateDelim);
+        d = da.join(f.dateDelim) + ' ';
       }
-      d += ' ' + prep(n.getHours(), 2)
-         + ':' + prep(n.getMinutes(), 2)
-         + ':' + prep(n.getSeconds(), 2);
+      d += prep(n.getHours(), 2)
+        + ':' + prep(n.getMinutes(), 2)
+        + ':' + prep(n.getSeconds(), 2);
       if (f.showMs) {
         d += '.' + prep(n.getMilliseconds(), 3);
       }
-      return d;
+      return dateCol(d);
+    };
+  }
+  else if (f.dateType === 'plain') {
+    getDate = function () {
+      return dateCol((new Date()).toLocaleTimeString());
     };
   }
   else {
-    getDate = function () {
-      return (new Date()).toLocaleTimeString();
-    };
+    console.error("Logule found invalid dateType in " + config);
   }
 
-  // global message suppression
-  globallyOff = (obj.useAllow) ? set.difference(levels, obj.allow) : obj.suppress;
-};
-
-applyConfig(cfg);
-
-// Pads a str to a str of length len
-var pad = function (str, len) {
-  return (str.length < len) ? str + Array(len - str.length + 1).join(' ') : str;
-};
+  // global suppression
+  globallyOff = (cfg.useAllow) ? set.difference(levels, cfg.allow) : cfg.suppress;
+}());
 
 // callsite helper
 var getStack = function () {
@@ -156,24 +186,17 @@ Object.keys(defaults).forEach(function (key) {
 // Logger base method
 Logger.prototype._log = function (lvl) {
   var args = arguments.length > 1 ? slice.call(arguments, 1) : []
-    , delim = levelMaps[lvl](cfg.delimiter)
-    , level = pad(lvl === 'zalgo' ? cfg.zalgo : lvl.toUpperCase(), max_lvl);
+    , d = delimMap[lvl];
 
   if (this.removed.indexOf(lvl) >= 0 || globallyOff.indexOf(lvl) >= 0) {
     return this;
   }
 
   var ns = this.namespaces.map(function (n) {
-    return cfg.prefixCol(c.bold(pad(n + '', this.size))) + " " + delim;
+    return prefixCol(c.bold(pad(n + '', this.size))) + " " + d;
   });
 
-  console.log.apply(console, [
-    cfg.dateCol(getDate())
-  , delim
-  , (cfg.bold.indexOf(lvl) >= 0) ? c.bold(level) : level
-  , delim
-  ].concat(ns, args));
-
+  console.log.apply(console, [getDate(), d, levelMap[lvl], d].concat(ns, args));
   return this;
 };
 
@@ -188,16 +211,15 @@ levels.forEach(function (name) {
   }
 });
 
-// Generate line logger separately if exists
-if (cfg.levels.line) {
-  Logger.prototype.line = function () {
-    var frame = getStack()[1];
-    this.namespaces.push(frame.getFileName() + ":" + frame.getLineNumber());
-    this._log.apply(this, concat.apply(['line'], arguments));
-    this.namespaces.pop();
-    return this;
-  };
-}
+// Generate line logger separately
+Logger.prototype.line = function () {
+  var frame = getStack()[1];
+  this.namespaces.push(frame.getFileName() + ":" + frame.getLineNumber());
+  this._log.apply(this, concat.apply(['line'], arguments));
+  this.namespaces.pop();
+  return this;
+};
+
 
 // Return a single Logger helper method
 Logger.prototype.get = function (fn) {
@@ -207,16 +229,16 @@ Logger.prototype.get = function (fn) {
     this.namespaces.pop();
   }
   else if (this.removed.indexOf(fn) < 0) {
-    var that = this
+    var self = this
       , l = this.sub();
 
     if (fn === 'line') {
       return function () {
-        that.line.apply(l, arguments);
+        self.line.apply(l, arguments);
       };
     }
     return function () {
-      that._log.apply(l, concat.apply([fn], arguments));
+      self._log.apply(l, concat.apply([fn], arguments));
     };
   }
   return $.noop;

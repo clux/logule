@@ -1,12 +1,15 @@
 TODO
 ==================
   * move config finder to own module
-  * proper testing of config stuff..
 
 
-0.7.1 / 2012-06-??
+0.8.0 / 2012-07-02
 ==================
   * Make backwards compatible with node 0.6 by using path.existsSync there
+  * Don't allow deleting original methods, only rename. Otherwise DI would break..
+  * Deprecates 0.7.X for DI compatibility reasons above
+  * Rewritten internal _log for efficiency : )
+  * config stuff has some basic tests
 
 0.7.0 / 2012-06-30
 ==================

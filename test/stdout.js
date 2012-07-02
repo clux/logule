@@ -7,14 +7,10 @@ var logule = require('../')
   , l = logule.sub('suppressed');
 l.suppress.apply(l, levels);
 
-// monkey-patch process.stdout to intercept its messages
+// monkey-patch process.stdout.write to intercept console.log calls
 var hook = function (cb) {
   var write = process.stdout.write;
-  process.stdout.write = function (string, encoding, fd) {
-    /* Hide output in test
-    write.apply(process.stdout, arguments);*/
-    cb(string, encoding, fd);
-  };
+  process.stdout.write = cb;
 
   // return an undo damage fn returned
   return function () {

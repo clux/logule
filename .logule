@@ -37,7 +37,7 @@ module.exports = {
     // 'custom'    -> allows a custom date string (slower)
 
     // options for dateType case 'method'
-  , dateMethod  : 'valueOf' // perhaps try toISOString()
+  , dateMethod  : 'valueOf' // perhaps try toISOString
 
     // opitons for dateType case 'custom'
   , showDate    : true    // prepend year month and day numbers before the time str

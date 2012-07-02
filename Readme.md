@@ -155,9 +155,9 @@ If no config is found, or it is incomplete, the default one in this directory wi
 
 ### Config Ideas
 #### Custom Prototype Log Methods
-Config files can fully specify/rename/add log methods with your own names (with two exceptions). The prototype methods created will be directly taken from the level object in the config file, and these will log with the specified color and with the same (upper cased in print) level.
+Config files can fully reconfigure/add new log methods with your own names. The prototype methods created will be directly taken from the level object in the config file, and these will log with the specified color and with the same (upper cased in print) level. Note that you can not remove the original methods (only suppress them) as to do so would break DI.
 
-The exceptions are `line` which will additionally include the file and line of callsite, and `zalgo` which has some idiosyncratic formatting. These two methods can only be removed, not renamed.
+Note that `line` which will additionally include the file and line of callsite when used, and `zalgo` will have some idiosyncratic formatting.
 
 #### Global Filtration
 Set the `suppress` flag to globally turn all listed log methods into chaining no-ops.
