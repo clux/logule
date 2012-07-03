@@ -1,6 +1,7 @@
-TODO
+0.8.1 / 2012-07-03
 ==================
-  * move config finder to own module
+  * moved config finder to own the `confortable` module
+  * General code linting and readability improvements
 
 
 0.8.0 / 2012-07-02

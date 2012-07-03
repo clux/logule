@@ -1,55 +1,19 @@
 var c = require('colors')
   , $ = require('autonomy')
   , set = require('subset')
-  , fs = require('fs')
-  , path = require('path')
   , semver = require('semver')
   , version = require('./package').version
-  , dotfile = require('./.logule')
+  , defaults = require('./.logule')
+  , custom = require('confortable')('.logule')
   , slice = Array.prototype.slice
-  , concat = Array.prototype.concat
-  , config = 'Default config';
+  , concat = Array.prototype.concat;
 
 // Pads a str to a str of length len
 var pad = function (str, len) {
   return (str.length < len) ? str + Array(len - str.length + 1).join(' ') : str;
 };
 
-// config searching and parsing
-var findConfig = function (name) {
-  var cwd = process.cwd()
-    , exists = fs.existsSync || path.existsSync
-    , cfg;
-
-  if (path.relative(process.env.HOME, cwd).slice(0, 2) === '..') {
-    // cwd is outside home, check cwd only
-    cfg = path.join(cwd, name);
-    return exists(cfg) ? cfg : null;
-  }
-  else {
-    // cwd is somewhere under HOME start in cwd and go up until we hit HOME
-    var dir = cwd;
-    while (path.relative(process.env.HOME, dir).slice(0, 2) !== '..') {
-      cfg = path.join(dir, name);
-      if (exists(cfg)) {
-        return cfg;
-      }
-      dir = path.join(dir, '..');
-    }
-    return null;
-  }
-};
-
-var getConfig = function (name) {
-  var file = findConfig(name);
-  if (file === null) {
-    return {};
-  }
-  config = file; // store path for error msgs
-  return require(file);
-};
-
-// applyConfig obtains these
+// obtained by self-executing config fn
 var levels
   , delimMap
   , levelMap
@@ -57,21 +21,21 @@ var levels
   , prefixCol
   , globallyOff;
 
-(function applyConfig() {
-  var obj = getConfig('.logule');
+(function () { // get config and precompute everything needed
+  var rawCfg = (custom) ? require(custom) : {};
 
   // extend levels on inner levels => no method removals => DI works
-  var levObj = $.extend(dotfile.levels, obj.levels || {});
+  var levObj = $.extend(defaults.levels, rawCfg.levels || {});
 
   // remaining cfg elements can be read from after a merge
-  var cfg = $.extend(dotfile, obj);
+  var cfg = $.extend(defaults, rawCfg);
 
   // cache color calls in delimMap/levelMap for _log
   levels = Object.keys(levObj);
   delimMap = levels.reduce(function (acc, lvl) {
     var fn = c[levObj[lvl]];
     if (!(fn instanceof Function)) {
-      console.error("invalid color function for level '" + lvl + "' found in " + config);
+      console.error("invalid color function for level '" + lvl + "' found in " + custom);
     }
     acc[lvl] = fn(cfg.delimiter);
     return acc;
@@ -89,10 +53,10 @@ var levels
   prefixCol = c[cfg.prefixCol]; // used by _log
   var dateCol = c[cfg.dateCol]; // only used by getDate
   if (!(prefixCol instanceof Function)) {
-    console.error("invalid color function for prefixCol found in " + config);
+    console.error("invalid color function for prefixCol found in " + custom);
   }
   if (!(dateCol instanceof Function)) {
-    console.error("invalid color function for dateCol found in " + config);
+    console.error("invalid color function for dateCol found in " + custom);
   }
 
   // prepad a number with zeroes so that it's n characters long
@@ -110,7 +74,7 @@ var levels
   }
   else if (f.dateType === 'method') {
     if (!(new Date())[f.dateMethod] instanceof Function) {
-      console.error("Logule found invalid dateMethod in " + config);
+      console.error("Logule found invalid dateMethod in " + custom);
     }
     getDate = function () {
       return dateCol((new Date())[f.dateMethod]());
@@ -127,9 +91,9 @@ var levels
         }
         d = da.join(f.dateDelim) + ' ';
       }
-      d += prep(n.getHours(), 2)
-        + ':' + prep(n.getMinutes(), 2)
-        + ':' + prep(n.getSeconds(), 2);
+      d += prep(n.getHours(), 2);
+      d += ':' + prep(n.getMinutes(), 2);
+      d += ':' + prep(n.getSeconds(), 2);
       if (f.showMs) {
         d += '.' + prep(n.getMilliseconds(), 3);
       }
@@ -142,7 +106,7 @@ var levels
     };
   }
   else {
-    console.error("Logule found invalid dateType in " + config);
+    console.error("Logule found invalid dateType in " + custom);
   }
 
   // global suppression
@@ -165,8 +129,8 @@ var getStack = function () {
 // Logger class
 function Logger() {}
 
-// instance defaults
-var defaults = {
+// prototype defaults
+var proto = {
   version : version
 , removed : []
 , size : 0
@@ -174,9 +138,9 @@ var defaults = {
 };
 
 // make undeletable instance defaults up the prototype chain
-Object.keys(defaults).forEach(function (key) {
+Object.keys(proto).forEach(function (key) {
   Object.defineProperty(Logger.prototype, key, {
-    value : defaults[key]
+    value : proto[key]
   , writable : false
   , enumerable : false
   , configurable : false
