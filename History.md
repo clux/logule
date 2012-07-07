@@ -6,7 +6,7 @@
 
 0.8.0 / 2012-07-02
 ==================
-  * Make backwards compatible with node 0.6 by using path.existsSync there
+  * Make backwards compatible with node 0.6 by using fs.existsSync there
   * Don't allow deleting original methods, only rename. Otherwise DI would break..
   * Deprecates 0.7.X for DI compatibility reasons above
   * Rewritten internal _log for efficiency : )
