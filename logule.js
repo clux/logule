@@ -4,7 +4,8 @@ var c = require('colors')
   , semver = require('semver')
   , version = require('./package').version
   , defaults = require('./.logule')
-  , custom = require('confortable')('.logule')
+  , fallback = require('path').dirname(module.parent.filename)
+  , custom = require('confortable')('.logule', process.cwd(), fallback)
   , slice = Array.prototype.slice
   , concat = Array.prototype.concat;
 

@@ -151,7 +151,7 @@ Since logule >= 0.7, rich configuration of colors, style, date formatting and gl
 
 When starting a node script requiring logule, logule will search from the execution directory for a `.logule` file. If that fails, it will keep searching one directory up until $HOME is hit.
 
-If no config is found, or it is incomplete, the default one in this directory will be used, or merged with the found one respectively.
+If no config is found, one final search is done in the parent's (the module that requires logule) directory, and the resulting config is merged carefully with the default one bundled with logule.
 
 ### Config Ideas
 #### Custom Prototype Log Methods

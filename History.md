@@ -1,3 +1,7 @@
+0.8.2 / 2012-07-18
+==================
+  * use newer confortable to allow modules to bundle own config if app does not specify
+
 0.8.1 / 2012-07-03
 ==================
   * moved config finder to own the `confortable` module
