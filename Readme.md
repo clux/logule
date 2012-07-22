@@ -4,9 +4,7 @@ Logule is a heavily configurable logging utility for nodejs. It is analogous to 
 
 Shortcut methods for the log levels are available as (by default): `log.error`, `log.warn`, `log.info`, `log.debug`, `log.trace`, `log.zalgo`, and as a bonus, `log.line`. These methods are additionally chainable.
 
-It favours a combination of Dependency Injection and environment variable based
-control to allow for both tree-based log level filtration (via DI),
-and globally controllable log levels (via config files).
+It favours a combination of Dependency Injection and config based control to allow for both tree-based log level filtration (via DI), and globally controllable log levels (via config files).
 
 ## Usage
 Basic usage:
