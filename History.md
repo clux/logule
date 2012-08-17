@@ -1,3 +1,7 @@
+NEXT / 2012-XX-XX
+==================
+  * bump confortable to fix issue 4
+
 0.8.2 / 2012-07-18
 ==================
   * use newer confortable to allow modules to bundle own config if app does not specify
