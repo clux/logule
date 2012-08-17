@@ -39,7 +39,7 @@ module.exports = {
     // options for dateType case 'method'
   , dateMethod  : 'valueOf' // perhaps try toISOString
 
-    // opitons for dateType case 'custom'
+    // options for dateType case 'custom'
   , showDate    : true    // prepend year month and day numbers before the time str
   , reverseDate : false   // reversed american DD MM YYYY or european YYYY MM DD
   , dateDelim   : '-'     // delimiter to use for the date string when showDate
