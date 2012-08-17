@@ -142,7 +142,7 @@ var eventsLog = modelsLog.sub('EVENT'); // pass this down from models to events
 ````
 
 Tree based log levels is the safe, overridable version of log levels.
-To strictly enforce suppression of certain levels, use environment variables.
+To strictly enforce suppression of certain levels, use config files.
 
 ## Configuration
 Since logule >= 0.7, rich configuration of colors, style, date formatting and global suppression of certain log levels is available. The [default configuration file](https://github.com/clux/logule/blob/master/.logule) results in output looking like the older versions.
