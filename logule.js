@@ -157,8 +157,9 @@ Logger.prototype._log = function (lvl) {
     return this;
   }
 
+  var padding = this.size;
   var ns = this.namespaces.map(function (n) {
-    return prefixCol(c.bold(pad(n + '', this.size))) + " " + d;
+    return prefixCol(c.bold(pad(n + '', padding))) + " " + d;
   });
 
   console.log.apply(console, [getDate(), d, levelMap[lvl], d].concat(ns, args));
