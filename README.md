@@ -152,7 +152,7 @@ When starting a node script requiring logule, logule will search from the execut
 If no config is found, one final search is done in the parent's (the module that requires logule) directory, and the resulting config is merged carefully with the default one bundled with logule.
 
 ### Stream JSON
-If 'logFile` is set in `.logule`, this file will be appended to with JSON log messages (one message per line). Thus, you can read the file and split by newline, or watch the file and emit/filter based on each JSON line you receive.
+If `logFile` is set in `.logule`, this file will be appended to with JSON log messages (one message per line). Thus, you can read the file and split by newline, or watch the file and emit/filter based on each JSON line you receive.
 
 The individual JSON messages use the current format (here prettified):
 
