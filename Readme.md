@@ -1,6 +1,6 @@
 # Logule [![Build Status](https://secure.travis-ci.org/clux/logule.png)](http://travis-ci.org/clux/logule)
 
-Logule is a heavily configurable logging utility for nodejs. It is analogous to `console.log` and can take multiple arguments, but additionally it prefixes the current time, the log level, and optionally, prefixed namespaces (with optional padding).
+Logule is a heavily configurable logging utility for nodejs. By default it prints only to stdout like `console.log`, but additionally it prefixes the current time, the log level, and optionally, prefixed namespaces (with optional padding). A log file can also be configured to stream JSON formatted log messages to a file for inspection of the raw data via short scripts.
 
 Shortcut methods for the log levels are available as (by default): `log.error`, `log.warn`, `log.info`, `log.debug`, `log.trace`, `log.zalgo`, and as a bonus, `log.line`. These methods are additionally chainable.
 
@@ -151,6 +151,20 @@ When starting a node script requiring logule, logule will search from the execut
 
 If no config is found, one final search is done in the parent's (the module that requires logule) directory, and the resulting config is merged carefully with the default one bundled with logule.
 
+### Stream JSON
+If 'logFile` is set in `.logule`, this file will be appended to with JSON log messages (one message per line). Thus, you can read the file and split by newline, or watch the file and emit/filter based on each JSON line you receive.
+
+The individual JSON messages use the current format (here prettified):
+
+````javascript
+{
+  "date": "08:14:11",
+  "level": "error",
+  "namespaces": ["build"],
+  "message": "message part, how it appeared in terminal"
+}
+````
+
 ### Config Ideas
 #### Custom Prototype Log Methods
 Config files can fully reconfigure/add new log methods with your own names. The prototype methods created will be directly taken from the level object in the config file, and these will log with the specified color and with the same (upper cased in print) level. Note that you can not remove the original methods (only suppress them) as to do so would break DI.
@@ -160,6 +174,7 @@ Note that `line` which will additionally include the file and line of callsite w
 #### Global Filtration
 Set the `suppress` flag to globally turn all listed log methods into chaining no-ops.
 If most methods listed should be disabled, quickly list the exceptions under the `allow` flag and set `useAllow` to `true`.
+
 
 ## Verifying Logule Validity
 When passing logule subs around, it might be useful for separate code to test
@@ -185,6 +200,7 @@ function (injectedLogule) {
 Note that single functions like `logule.get('info')` will of course not pass this test.
 If your API expects a single logger function, then
 you should simply type test the input as a function.
+
 
 ## Zalgo
 H̸̡̪̯ͨ͊̽̅̾̎Ȩ̬̩̾͛ͪ̈́̀́͘ ̶̧̨̱̹̭̯ͧ̾ͬC̷̙̲̝͖ͭ̏ͥͮ͟Oͮ͏̮̪̝͍M̲̖͊̒ͪͩͬ̚̚͜Ȇ̴̟̟͙̞ͩ͌͝S̨̥̫͎̭ͯ̿̔̀ͅ

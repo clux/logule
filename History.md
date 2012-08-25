@@ -1,6 +1,9 @@
-NEXT / 2012-XX-XX
+0.9.0 / 2012-07-25
 ==================
-  * bump confortable to fix issue 4
+  * Streaming JSON log transport for quick and dirty log quering scripts
+  * padding now only affects the first namespace
+  * bump confortable to fix issue #4
+  * fix padding issue #8
 
 0.8.2 / 2012-07-18
 ==================

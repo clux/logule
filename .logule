@@ -50,4 +50,7 @@ module.exports = {
 , useAllow  : false   // if true, use 'allow' option, else use 'suppress' option
 , suppress  : []      // every method on this list is suppressed
 , allow     : []      // every method in (levels \ this list) is suppressed
+
+  // JSON logging
+, logFile  : null     // path to file (relative to this configs location)
 };

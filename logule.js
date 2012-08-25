@@ -2,12 +2,20 @@ var c = require('colors')
   , $ = require('autonomy')
   , set = require('subset')
   , semver = require('semver')
+  , util = require('util')
+  , fs = require('fs')
+  , path = require('path')
   , version = require('./package').version
   , defaults = require('./.logule')
   , fallback = require('path').dirname(module.parent.filename)
   , custom = require('confortable')('.logule', process.cwd(), fallback)
   , slice = Array.prototype.slice
   , concat = Array.prototype.concat;
+
+fs.existsSync || (fs.existsSync = path.existsSync);
+var exists = function (file) {
+  return fs.existsSync(file) && !fs.statSync(file).isDirectory();
+};
 
 // Pads a str to a str of length len
 var pad = function (str, len) {
@@ -20,6 +28,8 @@ var levels
   , levelMap
   , getDate
   , prefixCol
+  , dateCol
+  , fileStream
   , globallyOff;
 
 (function () { // get config and precompute everything needed
@@ -30,6 +40,12 @@ var levels
 
   // remaining cfg elements can be read from after a merge
   var cfg = $.extend(defaults, rawCfg);
+
+  // prepare for JSON streaming if requested in config
+  if (cfg.logFile) {
+    var logPath = path.join(path.dirname(custom), cfg.logFile);
+    fileStream = fs.createWriteStream(logPath, {flags: 'a'});
+  }
 
   // cache color calls in delimMap/levelMap for _log
   levels = Object.keys(levObj);
@@ -52,7 +68,7 @@ var levels
 
   // misc colors
   prefixCol = c[cfg.prefixCol]; // used by _log
-  var dateCol = c[cfg.dateCol]; // only used by getDate
+  dateCol = c[cfg.dateCol]; // used by _log
   if (!(prefixCol instanceof Function)) {
     console.error("invalid color function for prefixCol found in " + custom);
   }
@@ -70,7 +86,7 @@ var levels
   if (f.dateType === 'precision') {
     getDate = function () {
       var d = new Date();
-      return dateCol(d.toLocaleTimeString() + '.' + prep(d.getMilliseconds(), 3));
+      return d.toLocaleTimeString() + '.' + prep(d.getMilliseconds(), 3);
     };
   }
   else if (f.dateType === 'method') {
@@ -78,7 +94,7 @@ var levels
       console.error("Logule found invalid dateMethod in " + custom);
     }
     getDate = function () {
-      return dateCol((new Date())[f.dateMethod]());
+      return (new Date())[f.dateMethod]();
     };
   }
   else if (f.dateType === 'custom') {
@@ -98,12 +114,12 @@ var levels
       if (f.showMs) {
         d += '.' + prep(n.getMilliseconds(), 3);
       }
-      return dateCol(d);
+      return d;
     };
   }
   else if (f.dateType === 'plain') {
     getDate = function () {
-      return dateCol((new Date()).toLocaleTimeString());
+      return (new Date()).toLocaleTimeString();
     };
   }
   else {
@@ -157,12 +173,22 @@ Logger.prototype._log = function (lvl) {
     return this;
   }
 
+  var date = getDate();
   var padding = this.size;
-  var ns = this.namespaces.map(function (n) {
-    return prefixCol(c.bold(pad(n + '', padding))) + " " + d;
+  var ns = this.namespaces.map(function (n, i) {
+    n = (i === 0) ? pad(n + '', padding) : n; // only pad first namespace level
+    return prefixCol(c.bold(n)) + " " + d;
   });
 
-  console.log.apply(console, [getDate(), d, levelMap[lvl], d].concat(ns, args));
+  console.log.apply(console, [dateCol(date), d, levelMap[lvl], d].concat(ns, args));
+
+  fileStream && fileStream.write(JSON.stringify({
+    date : date
+  , level : lvl
+  , namespaces : this.namespaces
+  , message : util.format.apply(this, args)
+  }) + '\n');
+
   return this;
 };
 
