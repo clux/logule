@@ -180,13 +180,14 @@ Logger.prototype._log = function (lvl) {
     return prefixCol(c.bold(n)) + " " + d;
   });
 
-  console.log.apply(console, [dateCol(date), d, levelMap[lvl], d].concat(ns, args));
+  var message = util.format.apply(this, args);
+  console.log.apply(console, [dateCol(date), d, levelMap[lvl], d].concat(ns, message));
 
   fileStream && fileStream.write(JSON.stringify({
     date : date
   , level : lvl
   , namespaces : this.namespaces
-  , message : util.format.apply(this, args)
+  , message : message
   }) + '\n');
 
   return this;
