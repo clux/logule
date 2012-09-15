@@ -1,3 +1,7 @@
+0.9.1 / 2012-09-15
+==================
+  * allow console.log formating with %d %s and %j identifiers
+
 0.9.0 / 2012-07-25
 ==================
   * Streaming JSON log transport for quick and dirty log quering scripts
