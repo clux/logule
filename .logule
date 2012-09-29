@@ -52,7 +52,7 @@ module.exports = {
 
 , nesting   : 3       // maxmimum number of nested namespaces shown in output
 
-  // global suppression
+  // global log levels
 , useAllow  : false   // if true, use 'allow' option, else use 'suppress' option
 , suppress  : []      // every method on this list is suppressed
 , allow     : []      // every method in (levels \ this list) is suppressed

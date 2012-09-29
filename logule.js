@@ -181,7 +181,7 @@ Logger.prototype.unmute = function () {
 };
 
 // Sets removed to (levels \ args)
-Logger.prototype.muteExcept = function () {
+Logger.prototype.unmuteOnly = function () {
   this.removed = set.difference(cfg.levels, slice.call(arguments, 0));
   if (this.isMain) {
     moduleMaps[this.id].removed = this.removed.slice();
@@ -189,9 +189,9 @@ Logger.prototype.muteExcept = function () {
   return this;
 };
 
-// Sets removed to (args \ levels)
+// Sets removed to (args)
 Logger.prototype.muteOnly = function () {
-  this.removed = set.difference(slice.call(arguments, 0), cfg.levels);
+  this.removed = slice.call(arguments, 0);
   if (this.isMain) {
     moduleMaps[this.id].removed = this.removed.slice();
   }

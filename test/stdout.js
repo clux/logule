@@ -6,7 +6,7 @@ var logule = require('../').init(module)
   , testMsg = "this is a test message"
   , zalgo = "Ź̩̫͎ͨ̾ͪ̂̿͢AL̡̘̥̅̅̓͒͆ͥ̽GO̥͙̫ͤͤ͊̋ͦ̍͠" // this is the default
   , l = logule.sub('suppressed');
-l.suppress.apply(l, levels);
+l.mute.apply(l, levels);
 
 // monkey-patch process.stdout.write to intercept console.log calls
 var hook = function (cb) {
@@ -79,7 +79,7 @@ test("stdout", function (t) {
 
   // suppressed methods do not send to stdout
   levels.forEach(function (lvl) {
-    var stdsub = stdlog.sub().suppress(lvl)
+    var stdsub = stdlog.sub().mute(lvl)
       , single = stdsub.get(lvl);
     stdsub[lvl](testMsg);
     t.equal(oldmsg, last(), "suppressed logger function does not send to stdout");
@@ -89,7 +89,7 @@ test("stdout", function (t) {
 
   // subs of suppressed do not send to stdout
   levels.forEach(function (lvl) {
-    var stdsub = stdlog.sub('THIS_DIES').suppress(lvl);
+    var stdsub = stdlog.sub('THIS_DIES').mute(lvl);
     stdsub.sub('SUBSUB')[lvl](testMsg);
     t.equal(oldmsg, last(), "sub()." + lvl + " does not send to stdout when parent was suppressed");
     stdsub.sub('SUBSUB').get(lvl)(testMsg);
@@ -98,19 +98,19 @@ test("stdout", function (t) {
 
   // but re-allowed ones will
   levels.forEach(function (lvl) {
-    var stdsub = stdlog.sub('supandallow').suppress(lvl)
+    var stdsub = stdlog.sub('supandallow').mute(lvl)
       , lastOut = last();
     stdsub[lvl]('i am suppressed');
     t.equal(lastOut, last(), "suppresed message ignored for " + lvl);
-    stdsub.allow(lvl);
+    stdsub.unmute(lvl);
     stdsub[lvl]('i am resurrected');
     t.ok(lastOut !== last(), "ressurrected method logs " + lvl + "again");
     lastOut = last(); // save new lastOut for later
   });
 
-  // suppressing a level does not affect other levels
+  // muting a level does not affect other levels
   levels.forEach(function (lvl) {
-    var stdsub = stdlog.sub('SEMI').suppress(lvl);
+    var stdsub = stdlog.sub('SEMI').mute(lvl);
 
     // via normal approach
     levels.forEach(function (lvl2) {
@@ -176,7 +176,7 @@ test("stdout", function (t) {
     if (lvl === 'info') {
       return;
     }
-    var stdsub = stdlog.sub('chainer').suppress(lvl)
+    var stdsub = stdlog.sub('chainer').mute(lvl)
       , oldsize = output.length;
     stdsub[lvl]('suppressed message').info('working message')[lvl]('another suppressed');
     t.equal(oldsize + 1, output.length, "hook pushed a str onto the output array (chained 3 calls but 2 suppressed)");
@@ -199,6 +199,52 @@ test("stdout", function (t) {
     t.ok(lastIncludes(160000), "multi argument message to " + lvl + " contains argument 2");
     t.ok(lastIncludes("WOWZA"), "multi argument message to " + lvl + " contains argument 3");
     t.ok(lastIncludes("{}"), "multi argument message to " + lvl + " contains argument 4");
+  });
+
+
+  // unmuteOnly affects only complement
+  levels.forEach(function (lvl) {
+    var stdsub = stdlog.sub('BLAH').unmuteOnly(lvl);
+
+    var oldsize = output.length
+      , include = (lvl === 'zalgo') ? zalgo : lvl.toUpperCase();
+    stdsub[lvl](testMsg);
+    t.ok(lastIncludes("BLAH"),  "unmuteOnly " + lvl + " does not mute self");
+    t.ok(lastIncludes(testMsg), "unmuteOnly " + lvl + " msg to self contains testMsg");
+    t.ok(lastIncludes(include), "unmuteOnly " + lvl + " msg includes level");
+    t.equal(oldsize + 1, output.length, "hook pushed a str onto the output array (semi suppress)");
+
+    // but all others muted
+    levels.forEach(function (lvl2) {
+      if (lvl2 === lvl) {
+        return;
+      }
+      var oldsize = output.length
+      stdsub[lvl2](testMsg);
+      t.equal(oldsize, output.length, "hook did not push a string onto the output array");
+    });
+  });
+
+  // muteOnly mutes everything but level
+  levels.forEach(function (lvl) {
+    var stdsub = stdlog.sub('BLOH').muteOnly(lvl);
+    var oldsize = output.length
+    stdsub[lvl](testMsg);
+    t.equal(oldsize, output.length, "hook did not push a string onto the output array");
+
+    // but all others muted
+    levels.forEach(function (lvl2) {
+      if (lvl2 === lvl) {
+        return;
+      }
+      var oldsize = output.length
+      , include = (lvl2 === 'zalgo') ? zalgo : lvl2.toUpperCase();
+      stdsub[lvl2](testMsg);
+      t.ok(lastIncludes("BLOH"),  "muteOnly " + lvl + " does not mute " + lvl2);
+      t.ok(lastIncludes(testMsg), "muteOnly " + lvl + " msg to self contains testMsg");
+      t.ok(lastIncludes(include), "muteOnly " + lvl + " msg includes level");
+      t.equal(oldsize + 1, output.length, "hook pushed a str onto the output array (semi suppress)");
+    });
   });
 
   unhook();

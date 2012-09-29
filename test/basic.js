@@ -1,9 +1,9 @@
 var logule = require('../').init(module)
   , test   = require('tap').test
   , levels = ['trace', 'debug', 'info', 'warn', 'error', 'zalgo', 'line']
-  , pubs = ['get', 'suppress', 'allow', 'sub']
+  , pubs = ['get', 'mute', 'unmute', 'muteOnly', 'muteExcept', 'sub']
   , l = logule.sub('suppressed');
-l.suppress.apply(l, levels); // l is always suppressed
+l.mute.apply(l, levels); // l is always suppressed
 
 test("chaining", function (t) {
   levels.forEach(function (lvl) {

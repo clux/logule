@@ -41,8 +41,8 @@ Logule strives to adhere these goals and beyond that tries to maintain a stable 
   * [get()](#get)
   * [mute()](#mute)
   * [unmute()](#unmute)
-  * [muteExcept()](#muteexcept)
   * [muteOnly()](#muteonly)
+  * [unmuteOnly()](#unmuteonly)
 * [Branch Based Filtration](#branch-based-filtration)
   * [Filtering Branches](#filtering-branches)
   * [Muting Chatty Modules](#muting-chatty-modules)
@@ -199,20 +199,21 @@ l2.debug('works!');
 log.debug('muted');
 ````
 
-#### muteExcept()
-A convenience for muting all levels except the ones passed in.
-
-````js
-log.muteExcept('error'); // only show errors
-````
-
 #### muteOnly()
-A convenience for unmute all levels except the ones passed in.
+A convenience for muting all levels passed in, and unmuting all others.
 
 ````js
-log.muteOnly('debug', 'trace'); // show everything except debug and trace messages
+log.muteOnly('debug', 'trace'); // unmute everything except debug and trace messages
+log.muteOnly(); // muteOnly nothing === unmute everything
 ````
 
+#### unmuteOnly()
+A convenience for unmuting all levels passed in, and muting the others.
+
+````js
+log.unmuteOnly('error'); // only errors unmuted
+log.unmuteOnly(); // unmuteOnly nothing === mute everything
+````
 
 ### Branch Based Filtration
 Controlling global levels is done via config files, but the levels not globally suppressed therein can temporarily muted/unmuted at any branch point and these settings will propagate down the call tree.
