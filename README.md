@@ -32,7 +32,7 @@ Logule strives to adhere these goals and beyond that tries to maintain a stable 
 * [Configuration](#configuration)
   * [Date Formatting](#date-formatting)
   * [Changing Colors](#changing-colors)
-  * [Global Filtration](#global-filtration)
+  * [Global Suppression](#global-suppression)
   * [Stream JSON](#stream-json)
 * [Instance Methods](#instance-methods)
   * [Defaults](#defaults)
@@ -251,9 +251,10 @@ l.debug('works');
 
 With the following code, `a.js` sets the app default of _no debug logging_, which is overridden by `b.js`, and propagates to `c.js`. Note that the `app` namespace set in `a.js` propagates down to both `b.js` and `c.js`, but `c.js` will show two namespaces: `app` and `leaf` provided the config setting `nesting >= 2`.
 
-Note that any mute/unmute calls to a `sub()` does not propagate:
+Note that any mute/unmute calls to a `sub()` does not propagate to other files:
 
 ````js
+// a.js as above
 // b.js
 var l = require('logule').init(module).sub().unmute('debug');
 l.debug('works');
@@ -264,7 +265,7 @@ l.debug('still muted');
 ````
 
 In short tree based log levels is the safe, *overridable version* of log levels.
-To enforce strict suppression of certain levels, setting the config files settings are the way to go.
+To enforce strict suppression of certain levels, the config file is the way to go.
 
 #### Muting Chatty Modules
 Say you want to mute warnings in the file `c.js` above. If you own the file, you easily just edit the first line to be:
