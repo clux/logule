@@ -12,7 +12,7 @@ What you really want, is not simply configurability, but a *hierarchy of configu
 - Mute specific log levels globablly
 - Mute non-fatal info from certain branches of code
 - Mute chatty modules
-- Show all logs from new modules you just started developing for
+- Unmute new/experimental modules during development
 
 as well as being able to configure *how* your:
 
@@ -34,14 +34,16 @@ Logule strives to adhere these goals and beyond that tries to maintain a stable 
   * [Changing Colors](#changing-colors)
   * [Global Filtration](#global-filtration)
   * [Stream JSON](#stream-json)
-* [API](#api)
-  * [Default Log Methods](#default-log-methods)
-  * [Line](#line)
-  * [Zalgo](#zalgo)
-  * [Get](#get)
+* [Instance Methods](#instance-methods)
+  * [Defaults](#defaults)
+  * [line()](#line)
+  * [zalgo()](#zalgo)
+  * [get()](#get)
+  * [mute()](#mute)
+  * [unmute()](#unmute)
+  * [muteExcept()](#muteexcept)
+  * [muteOnly()](#muteonly)
 * [Branch Based Filtration](#branch-based-filtration)
-  * [Suppress](#suppress)
-  * [Allow](#allow)
   * [Filtering Branches](#filtering-branches)
   * [Muting Chatty Modules](#muting-chatty-modules)
   * [Unmuting New Modules](#unmuting-new-modules)
@@ -75,34 +77,34 @@ logule.info("Shutting down")
 
 ![one namespace output!](https://github.com/clux/logule/raw/master/imgs/output.png)
 
-Namespaces nest and are assigned in the order of registration (`init`) to match the call tree. See [Filtering Branches](#filtering-branches) for an example.
+Namespaces nest and are assigned in the order of registration (`init()` calls) to match the call tree. See [Filtering Branches](#filtering-branches) for an example.
 
 ## Subs
-Sometimes you want to create namespaces a little more granularly, perhaps you would like to dependency inject a sandboxed version of your logger to an internal or external class that supports multiple logging modules. Well, this is easy:
+Sometimes you want to create namespaces a little more granularly, perhaps you would like to dependency inject a sandboxed version of your logger to an internal or external class. Well, this is easy:
 
 ````js
 var log = require('logule').init(module, 'myFile');
-var sandboxed = log.sub('CrazyClass').suppress('debug');
+var sandboxed = log.sub('CrazyClass').mute('debug');
 // pass sandboxed logger to CrazyClass
 ````
 
-A `log.sub()` will maintain the the default namespaces and suppression settings of `log`. It can also optionally append one extra namespace to the ones existing, in this case, 'CrazyClass' will be appended.
+A `log.sub()` will maintain the the default namespaces and mute settings of `log`. It can also optionally append one extra namespace to the ones existing, in this case, 'CrazyClass' will be appended.
 
 Since the output of `var log = require('logule').init(module)`, `log.sub()` and `log.sub().sub()` (etc) all act similarly and on the same API, the variable `log` will in this document be used to refer to a logger instance that came from any of these origins.
 
 ## Configuration
-Rich configuration of colors, style, date formatting and global suppression of certain log levels are all available via config files. The [default configuration file](https://github.com/clux/logule/blob/master/.logule) (which *contains documentation*) results in output looking like the images herein.
+Rich configuration of colors, style, date formatting and global muting of certain log levels are all available via config files. The [default configuration file](https://github.com/clux/logule/blob/master/.logule) (which *contains documentation*) results in output looking like the images herein.
 
 Configs are located via [confortable](https://github.com/clux/confortable). Which is a module that performs priority based config searches. In particular, it is used here with the following path priorities:
 
--1. execution directory
--2a). if (exec dir is inside  $HOME) Up to and including $HOME in '..' increments
--2b). if (exec dir is outside $HOME) $HOME
--3. directory of module.parent
+- 1. execution directory
+- 2a). if (`execDir` outside `$HOME`) `$HOME`
+- 2b). if (`execDir` inside  `$HOME`) Up to and including `$HOME` in `..` increments
+- 3. directory of `module.parent`
 
 Step 3 enables modules to bundle their own default config which can be overriden by apps by utilizing step 2.
 
-The found config file is merged carefully with the default config. In particular, one cannot remove the default log levels (lest we break dependency injection).
+The found config file is merged carefully with the default config, so you don't have to include more in your config that you disagree with. Also note you cannot remove the default log levels (lest we break dependency injection).
 
 ### Date Formatting
 How or if to prepend the date has been the most controversial choice previously made for you in early versions of logule. Those days are now gone, however, and multiple different date formatting types exist.
@@ -122,11 +124,12 @@ The following options affect output colors:
 - `dateCol` time and date
 - `lineCol` location in .line()
 
-Additionally 'levels' define the color of the delimiter in each log method.
+Additionally `levels` define the color of the delimiter in each log method.
+Every string used to describe colors must be exported by the `colors` module to work.
 
-### Global Filtration
+### Global Suppression
 Set the `suppress` flag to globally turn all listed log methods into chaining no-ops.
-Alternatively ist the exceptions under `allow` instead and set `useAllow` to `true`.
+Alternatively list the exceptions under `allow` instead and set `useAllow` to `true`.
 See the [Branch based filtration](#branch-based-filtration) section for more granular control.
 
 ### Stream JSON
@@ -143,17 +146,13 @@ The individual JSON messages use the current format:
 }
 ````
 
-## API
-### Default Log Methods
-The following methods names are always available on a `log` instance:
+## Instance Methods
+### Defaults
+The methods available on a logger instance are: `trace`, `debug`, `info`, `line`, `warn`, `error`, and `zalgo`. They only vary their delimiter color and some might be boldened depending on the config setting.
 
-````js
-var methods = ['trace', 'debug', 'info', 'line', 'warn', 'error', 'zalgo'];
-````
+The mystical `zalgo` and `line` provide some specialized logic however:
 
-The mystical `zalgo` and `line` provide some specialized logic:
-
-#### Line
+#### line()
 Line is prepends the filename and line of caller (as a namespace). It fetches this info from the stack directly.
 
 ````js
@@ -165,14 +164,14 @@ log.line();
 
 ![line output!](https://github.com/clux/logule/raw/master/imgs/line.png)
 
-#### Zalgo
+#### zalgo()
 H̸̡̪̯ͨ͊̽̅̾̎Ȩ̬̩̾͛ͪ̈́̀́͘ ̶̧̨̱̹̭̯ͧ̾ͬC̷̙̲̝͖ͭ̏ͥͮ͟Oͮ͏̮̪̝͍M̲̖͊̒ͪͩͬ̚̚͜Ȇ̴̟̟͙̞ͩ͌͝S̨̥̫͎̭ͯ̿̔̀ͅ
 
 ````js
 log.zalgo('core melting')
 ````
 
-#### Get
+#### get()
 A debug module may only need `log.debug`. You can save typing, and enforce this behaviour by calling `.get('debug')` on an instance, to return the correctly bound instance method to pass down.
 
 ````js
@@ -180,31 +179,47 @@ var dbg = log.get('debug');
 dbg("works like log.debug - but nothing else accessible via this non-chainging var");
 ````
 
-Note that if `log` have called `.suppress('debug')` earlier or up the call graph - or if it is a `.sub()` of an instance that have called `.suppress('debug')` - then you would only get a suppressed function from `.get('debug')`.
+Note that if `log` have muted or suppressed (i.e. in the config) debug - then you would only get a noop from `.get('debug')`.
 
-### Branch Based Filtration
-Controlling global levels is done via config files, but the levels not globally muted in the config can be turned on and off at any branch point:
-
-#### Suppress
+#### mute()
 Suppress logs for passed in methods.
 
 ````js
-log.suppress('debug', 'info');
-log.warn('works').info('suppressed').error('works').debug('suppressed');
+log.mute('debug', 'info');
+log.warn('works').info('muted').error('works').debug('muted');
 ````
 
-#### Allow
-Unsuppress logs for passed in methods.
+#### unmute()
+Unmutes logs for passed in methods.
 
 ````js
-log.suppress('debug', 'info');
-var l2 = log.sub('forModuleX').allow('debug');
+log.mute('debug', 'info');
+var l2 = log.sub('forModuleX').unmute('debug');
 l2.debug('works!');
-log.debug('suppressed');
+log.debug('muted');
 ````
 
+#### muteExcept()
+A convenience for muting all levels except the ones passed in.
+
+````js
+log.muteExcept('error'); // only show errors
+````
+
+#### muteOnly()
+A convenience for unmute all levels except the ones passed in.
+
+````js
+log.muteOnly('debug', 'trace'); // show everything except debug and trace messages
+````
+
+
+### Branch Based Filtration
+Controlling global levels is done via config files, but the levels not globally suppressed therein can temporarily muted/unmuted at any branch point and these settings will propagate down the call tree.
+
+
 #### Filtering Branches
-The examples for suppress/allow only shows the basic API for using subs. You do not have to create subs and pass them down via dependency injection. You can of course do this, but if you write short modules, it's generally easier to let `init()` do the heavy lifting.
+The examples for mute/unmute only shows the basic API for using subs. You do not have to create subs and pass them down via dependency injection. You can of course do this, but if you write short modules, it's generally easier to let `init()` do the heavy lifting.
 
 To get the most out of call tree filtration consider the following example of an application structure:
 
@@ -214,18 +229,18 @@ a.js
    └───c.js
 ````
 
-When just using suppress/allow on an instance returned directly by `init()` logule will remember the call tree and apply the same rules to the ones further down the tree by default:
+When just using mute/unmute on an instance returned directly by `init()` logule will remember the call tree and apply the same rules to the ones further down the tree by default:
 
 ````js
 // a.js
-var l = require('logule').init(module, 'app').suppress('debug');
+var l = require('logule').init(module, 'app').mute('debug');
 var b = require('./b');
 
 // b.js
 var l = require('logule').init(module);
 var c = require('./c');
-l.debug('suppressed');
-l.allow('debug');
+l.debug('muted');
+l.unmute('debug');
 l.debug('works');
 
 // c.js
@@ -235,44 +250,43 @@ l.debug('works');
 
 With the following code, `a.js` sets the app default of _no debug logging_, which is overridden by `b.js`, and propagates to `c.js`. Note that the `app` namespace set in `a.js` propagates down to both `b.js` and `c.js`, but `c.js` will show two namespaces: `app` and `leaf` provided the config setting `nesting >= 2`.
 
-Note that any suppress/allow calls to a `sub()` does not propagate:
+Note that any mute/unmute calls to a `sub()` does not propagate:
 
 ````js
 // b.js
-var l = require('logule').init(module).sub().allow('debug');
+var l = require('logule').init(module).sub().unmute('debug');
 l.debug('works');
 
 // c.js
 var l = require('logule').init(module);
-l.debug('suppressed');
+l.debug('still muted');
 ````
 
 In short tree based log levels is the safe, *overridable version* of log levels.
-To strictly enforce suppression of certain levels, enforce log levels in your config files.
+To enforce strict suppression of certain levels, setting the config files settings are the way to go.
 
 #### Muting Chatty Modules
 Say you want to mute warnings in the file `c.js` above. If you own the file, you easily just edit the first line to be:
 
 ````js
 // c.js
-var l = require('logule').init(module).suppress('warn');
+var l = require('logule').init(module).mute('warn');
 ````
 
 However, if you don't own the file, perhaps it's deep down in the npm hierarchy for instance, you can propagate more simply from `b.js`.
 
 ````js
 // b.js
-var logule = require('logule').init(module).suppress('warn');
-var l = logule.sub().allow('warn');
+var l = require('logule').init(module).mute('warn').sub().unmute('warn');
 var c = require('./c');
-l.debug('suppressed');
-l.warn('works');
+l.debug('muted');
+l.warn('unmuted, but down the call tree it is muted');
 ````
 
-Here we suppress the main logger from `b.js` (the one from `init`), but allow warnings to a `sub` that will be used inside this file to preserve the same behaviour inside `b.js`.
+Here we mute the main logger from `b.js` (the one from `init`), but unmute warnings to a `sub` that will be used inside this file to preserve the same behaviour inside `b.js` only.
 
 #### Unmuting New Modules
-Essentially the inverse of [Muting chatty modules](#muting-chatty-modules), here we allow one level above or in the file itself if we own it.
+Essentially the inverse of [Muting chatty modules](#muting-chatty-modules), here we unmute one level above or in the file itself if we own it.
 
 ## Installation
 
