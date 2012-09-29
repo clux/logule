@@ -104,7 +104,7 @@ Configs are located via [confortable](https://github.com/clux/confortable). Whic
 
 Step 3 enables modules to bundle their own default config which can be overriden by apps by utilizing step 2.
 
-The found config file is merged carefully with the default config, so you don't have to include more in your config that you disagree with. Also note you cannot remove the default log levels (lest we break dependency injection).
+The found config file is merged carefully with the default config, so you don't have to include more in your config than you disagree with. Also note you cannot remove the default log levels (lest we break dependency injection).
 
 ### Date Formatting
 How or if to prepend the date has been the most controversial choice previously made for you in early versions of logule. Those days are now gone, however, and multiple different date formatting types exist.
@@ -203,7 +203,7 @@ log.debug('muted');
 A convenience for muting all levels passed in, and unmuting all others.
 
 ````js
-log.muteOnly('debug', 'trace'); // unmute everything except debug and trace messages
+log.muteOnly('debug', 'trace'); // only trace & debug muted
 log.muteOnly(); // muteOnly nothing === unmute everything
 ````
 
@@ -287,7 +287,7 @@ l.warn('unmuted, but down the call tree it is muted');
 Here we mute the main logger from `b.js` (the one from `init`), but unmute warnings to a `sub` that will be used inside this file to preserve the same behaviour inside `b.js` only.
 
 #### Unmuting New Modules
-Essentially the inverse of [Muting chatty modules](#muting-chatty-modules), here we unmute one level above or in the file itself if we own it.
+Essentially the inverse of [Muting chatty modules](#muting-chatty-modules), here we unmute one file above or in the file itself if we own it.
 
 ## Installation
 
