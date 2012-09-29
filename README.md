@@ -64,7 +64,7 @@ log
 ![simple output!](https://github.com/clux/logule/raw/master/imgs/outputsimple.png)
 
 ## Namespaces
-To add a namespace to this module, add a second parameter to `init()`
+To add a namespace to this module, add a second parameter to `init()`.
 
 ````js
 log = require('logule').init(module, 'BUILD');
@@ -74,6 +74,8 @@ logule.info("Shutting down")
 ````
 
 ![one namespace output!](https://github.com/clux/logule/raw/master/imgs/output.png)
+
+Namespaces nest and are assigned in the order of registration (`init`) to match the call tree. See [Filtering Branches](#filtering-branches) for an example.
 
 ## Subs
 Sometimes you want to create namespaces a little more granularly, perhaps you would like to dependency inject a sandboxed version of your logger to an internal or external class that supports multiple logging modules. Well, this is easy:
@@ -227,11 +229,11 @@ l.allow('debug');
 l.debug('works');
 
 // c.js
-var l = require('logule').init(module);
+var l = require('logule').init(module, 'leaf');
 l.debug('works');
 ````
 
-With the following code, `a.js` sets the app default of _no debug logging_, which is overridden by `b.js`, and propagates to `c.js`. Note that the `app` namespace set in `a.js` propagates down to both `b.js` and `c.js`.
+With the following code, `a.js` sets the app default of _no debug logging_, which is overridden by `b.js`, and propagates to `c.js`. Note that the `app` namespace set in `a.js` propagates down to both `b.js` and `c.js`, but `c.js` will show two namespaces: `app` and `leaf` provided the config setting `nesting >= 2`.
 
 Note that any suppress/allow calls to a `sub()` does not propagate:
 
