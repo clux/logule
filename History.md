@@ -1,12 +1,12 @@
-0.10.0 / 2012-XX-XX
+1.0.0 / 2012-09-29
 ==================
-  * split up config merger code into own file to allow for easiers collaborative editing
-  * drop dependency injection targeting code for implicit hierarchy via node's: `module`
-
-  This has several effects: Now only an `init()` factory is exposed, and the first call to this
-  will associate itself with the call tree so that no DI is necessary to get tree filtration
-  and modules no longer have to test at all for optional logule injects (which were boilerplaty
-  and bad anyway). See updated readme regarding this as it breaks simple API usage a bit.
+  * explicit dependency injection replaced with internal bookkeeping, see readme for how to use this
+    **code must now initialize a logger after require**: `var log = require('logule').init(module)`
+  * `verify` method removed
+  * `suppress` renamed to `mute`
+  * `allow` renamed to `unmute`
+  * `muteOnly` method added
+  * `unmuteOnly` method added
 
   * Config entry: `delimiter` should now include whitespace on both ends. I.e. '-' -> ' - '
   * Config entry: `nesting` specifies the maximal nesting number allowed for namespaces.
@@ -14,6 +14,7 @@
   * Config option: `dateType = 'none'` now allowed to remove dates from output entirely
   * Empty messages now remove the last delimiter
 
+  * config merger code is now in a separate file
 
 0.9.1 / 2012-09-15
 ==================
