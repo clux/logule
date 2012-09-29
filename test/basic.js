@@ -1,7 +1,7 @@
 var logule = require('../').init(module)
   , test   = require('tap').test
   , levels = ['trace', 'debug', 'info', 'warn', 'error', 'zalgo', 'line']
-  , pubs = ['get', 'mute', 'unmute', 'muteOnly', 'muteExcept', 'sub']
+  , pubs = ['get', 'mute', 'unmute', 'muteOnly', 'unmuteOnly', 'sub']
   , l = logule.sub('suppressed');
 l.mute.apply(l, levels); // l is always suppressed
 
