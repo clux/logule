@@ -137,7 +137,7 @@ Logger.prototype.get = function (fn) {
     this.namespaces.pop();
   }
   else if (this.removed.indexOf(fn) >= 0 || cfg.globallyOff.indexOf(fn) >= 0) {
-    // level was suppressed locally or globally, result would just be an expensive noop
+    // level was muted locally or globally, result would just be an expensive noop
     return $.noop;
   }
 
@@ -156,7 +156,7 @@ Logger.prototype.get = function (fn) {
 
 // Suppress logs for specified levels
 // affects this logger and new loggers inheriting from parent call graph
-Logger.prototype.suppress = function () {
+Logger.prototype.mute = function () {
   if (arguments.length) {
     this.removed = set.union(this.removed, slice.call(arguments, 0));
     // ensure subs / new inits cannot use these functions either
@@ -167,15 +167,33 @@ Logger.prototype.suppress = function () {
   return this;
 };
 
-// Allow logs for specific levels for this logger only (does not override global suppresses)
+// Allow logs for specific levels for this logger only (does not override global mutes)
 // affects this logger and new loggers inheriting from parent call graph
-Logger.prototype.allow = function () {
+Logger.prototype.unmute = function () {
   if (arguments.length) {
     this.removed = set.difference(this.removed, slice.call(arguments, 0));
     // allow subs / new inits to use these functions as well
     if (this.isMain) {
       moduleMaps[this.id].removed = this.removed.slice();
     }
+  }
+  return this;
+};
+
+// Sets removed to (levels \ args)
+Logger.prototype.muteExcept = function () {
+  this.removed = set.difference(cfg.levels, slice.call(arguments, 0));
+  if (this.isMain) {
+    moduleMaps[this.id].removed = this.removed.slice();
+  }
+  return this;
+};
+
+// Sets removed to (args \ levels)
+Logger.prototype.muteOnly = function () {
+  this.removed = set.difference(slice.call(arguments, 0), cfg.levels);
+  if (this.isMain) {
+    moduleMaps[this.id].removed = this.removed.slice();
   }
   return this;
 };
