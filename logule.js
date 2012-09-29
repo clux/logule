@@ -42,9 +42,12 @@ Object.keys(proto).forEach(function (key) {
   });
 });
 
-// store `module` maps locally as multiple require('logule') calls are cached
-// TODO: globalize to communicate with _physically_ different copies of logule?
-var moduleMaps = {};
+// store a process specific variable for logule to communicate across different copies
+// communication happen only on frozen API parts
+if (!process.logule) {
+  process.logule = {}
+}
+var moduleMaps = process.logule;
 exports.init = function (parent, moduleName) {
   if (!parent || !parent.id) {
     var fail = new Logger('logule');
