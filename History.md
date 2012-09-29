@@ -1,3 +1,20 @@
+0.10.0 / 2012-XX-XX
+==================
+  * split up config merger code into own file to allow for easiers collaborative editing
+  * drop dependency injection targeting code for implicit hierarchy via node's: `module`
+
+  This has several effects: Now only an `init()` factory is exposed, and the first call to this
+  will associate itself with the call tree so that no DI is necessary to get tree filtration
+  and modules no longer have to test at all for optional logule injects (which were boilerplaty
+  and bad anyway). See updated readme regarding this as it breaks simple API usage a bit.
+
+  * Config entry: `delimiter` should now include whitespace on both ends. I.e. '-' -> ' - '
+  * Config entry: `nesting` specifies the maximal nesting number allowed for namespaces.
+  * Config entry: `lineCol` to specify color of file:line prefix as it no longer uses namespaces (and therefore does not count towards `nesting` total). Defaulted it to green.
+  * Config option: `dateType = 'none'` now allowed to remove dates from output entirely
+  * Empty messages now remove the last delimiter
+
+
 0.9.1 / 2012-09-15
 ==================
   * allow console.log formating with %d %s and %j identifiers

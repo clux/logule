@@ -5,7 +5,7 @@
  */
 module.exports = {
   // delimiter to use between time, log level, namespace(s) and the message
-  delimiter : '-'
+  delimiter : ' - '
   // Levels and their log output delimiter color-method
 , levels    : {
     trace       : 'grey'
@@ -21,10 +21,13 @@ module.exports = {
   // misc colors
 , prefixCol : 'blue'
 , dateCol   : 'grey'
+, lineCol   : 'green'
 
   // extra styling
   // critical errors in bold by default
 , bold      : ['error']
+  // padding of the first namespace
+, pad       :  0
   // when including the zalgo level, what level key to use
 , zalgo     : 'Ź̩̫͎ͨ̾ͪ̂̿͢AL̡̘̥̅̅̓͒͆ͥ̽GO̥͙̫ͤͤ͊̋ͦ̍͠' // unobtrusive alternating letter zalgification default
 
@@ -35,6 +38,7 @@ module.exports = {
     // 'precision' -> HH:MM:SS:MSS via toLocateTimeString + padded getMilliSeconds()
     // 'method'    -> efficient custom via method name on Date.prototype
     // 'custom'    -> allows a custom date string (slower)
+    // 'none'      -> Don't prepend any time/date info
 
     // options for dateType case 'method'
   , dateMethod  : 'valueOf' // perhaps try toISOString
@@ -45,6 +49,8 @@ module.exports = {
   , dateDelim   : '-'     // delimiter to use for the date string when showDate
   , showMs      : false   // append milliseconds to the time string
   }
+
+, nesting   : 3       // maxmimum number of nested namespaces shown in output
 
   // global suppression
 , useAllow  : false   // if true, use 'allow' option, else use 'suppress' option
