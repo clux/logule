@@ -52,7 +52,7 @@ Logule strives to adhere these goals and beyond that tries to maintain a stable 
 ## Basic Usage
 Require a logule instance for the current file and use it everywhere inside it.
 
-````javascript
+````js
 var log = require('logule').init(module);
 log
   .error("this is an error message")
@@ -66,7 +66,7 @@ log
 ## Namespaces
 To add a namespace to this module, add a second parameter to `init()`
 
-````javascript
+````js
 log = require('logule').init(module, 'BUILD');
 log.trace("Trying to compile main.js");
 log.error("Failed");
@@ -78,7 +78,7 @@ logule.info("Shutting down")
 ## Subs
 Sometimes you want to create namespaces a little more granularly, perhaps you would like to dependency inject a sandboxed version of your logger to an internal or external class that supports multiple logging modules. Well, this is easy:
 
-````javascript
+````js
 var log = require('logule').init(module, 'myFile');
 var sandboxed = log.sub('CrazyClass').suppress('debug');
 // pass sandboxed logger to CrazyClass
@@ -93,10 +93,10 @@ Rich configuration of colors, style, date formatting and global suppression of c
 
 Configs are located via [confortable](https://github.com/clux/confortable). Which is a module that performs priority based config searches. In particular, it is used here with the following path priorities:
 
-1. execution directory
-2a). if (exec dir is inside  $HOME) Up to and including $HOME in '..' increments
-2b). if (exec dir is outside $HOME) $HOME
-3. directory of module.parent
+-1. execution directory
+-2a). if (exec dir is inside  $HOME) Up to and including $HOME in '..' increments
+-2b). if (exec dir is outside $HOME) $HOME
+-3. directory of module.parent
 
 Step 3 enables modules to bundle their own default config which can be overriden by apps by utilizing step 2.
 
@@ -105,35 +105,34 @@ The found config file is merged carefully with the default config. In particular
 ### Date Formatting
 How or if to prepend the date has been the most controversial choice previously made for you in early versions of logule. Those days are now gone, however, and multiple different date formatting types exist.
 
-- 'plain'     -> prepends HH:MM:SS + delimiter via `toLocaleTimeString`
-- 'precision' -> prepends HH:MM:SS:MSS + delimiter via above + padded `getMilliseconds`
-- 'method'    -> prepends the result of any custom method on `Date.prototype`
-- 'none'      -> Nothing prepended. Log output starts at type, e.g. the `INFO` part.
-- 'custom'    -> Allows four extra settings.
+- `plain`     -> prepends HH:MM:SS + delimiter via `toLocaleTimeString`
+- `precision` -> prepends HH:MM:SS:MSS + delimiter via above + padded `getMilliseconds`
+- `method`    -> prepends the result of any custom method on `Date.prototype`
+- `none`      -> Nothing prepended. Log output starts at type, e.g. the `INFO` part.
+- `custom`    -> Allows four extra settings.
 
-If 'custom' set, you can also prepend the date to either 'plain' or 'precision', i.e. prepend YYYY-MM-DD, possibly reversing it if you're american, and possibly changing the delimiter.
+If `custom` set, you can also prepend the date to either `plain` or `precision`, i.e. prepend YYYY-MM-DD, possibly reversing it if you're american, and possibly changing the delimiter.
 
 ### Changing Colors
 The following options affect output colors:
 
-- 'prefixCol' - namespace
-- 'dateCol' - time and date
-- 'lineCol' - location in .line()
+- `prefixCol` - namespace
+- `dateCol` time and date
+- `lineCol` location in .line()
 
 Additionally 'levels' define the color of the delimiter in each log method.
 
 ### Global Filtration
 Set the `suppress` flag to globally turn all listed log methods into chaining no-ops.
 Alternatively ist the exceptions under `allow` instead and set `useAllow` to `true`.
-For branch based suppression see allow and suppress.
-TODO: links
+See the [Branch based filtration](#branch-based-filtration) section for more granular control.
 
 ### Stream JSON
 If `logFile` is filled in, this file will be appended to with JSON log messages (one message per line). Thus, you can read the file and split by newline, or watch the file and emit/filter based on each JSON line you receive.
 
 The individual JSON messages use the current format:
 
-````javascript
+````js
 {
   "date": "08:14:11",
   "level": "error",
@@ -146,7 +145,7 @@ The individual JSON messages use the current format:
 ### Default Log Methods
 The following methods names are always available on a `log` instance:
 
-````
+````js
 var methods = ['trace', 'debug', 'info', 'line', 'warn', 'error', 'zalgo'];
 ````
 
@@ -155,7 +154,7 @@ The mystical `zalgo` and `line` provide some specialized logic:
 #### Line
 Line is prepends the filename and line of caller (as a namespace). It fetches this info from the stack directly.
 
-````javascript
+````js
 var log = require('logule').init(module, 'broken');
 log.debug('dumping lines to console');
 log.line();
@@ -167,14 +166,14 @@ log.line();
 #### Zalgo
 H̸̡̪̯ͨ͊̽̅̾̎Ȩ̬̩̾͛ͪ̈́̀́͘ ̶̧̨̱̹̭̯ͧ̾ͬC̷̙̲̝͖ͭ̏ͥͮ͟Oͮ͏̮̪̝͍M̲̖͊̒ͪͩͬ̚̚͜Ȇ̴̟̟͙̞ͩ͌͝S̨̥̫͎̭ͯ̿̔̀ͅ
 
-````javascript
+````js
 log.zalgo('core melting')
 ````
 
 #### Get
 A debug module may only need `log.debug`. You can save typing, and enforce this behaviour by calling `.get('debug')` on an instance, to return the correctly bound instance method to pass down.
 
-````javascript
+````js
 var dbg = log.get('debug');
 dbg("works like log.debug - but nothing else accessible via this non-chainging var");
 ````
@@ -187,7 +186,7 @@ Controlling global levels is done via config files, but the levels not globally 
 #### Suppress
 Suppress logs for passed in methods.
 
-````javascript
+````js
 log.suppress('debug', 'info');
 log.warn('works').info('suppressed').error('works').debug('suppressed');
 ````
@@ -195,7 +194,7 @@ log.warn('works').info('suppressed').error('works').debug('suppressed');
 #### Allow
 Unsuppress logs for passed in methods.
 
-````javascript
+````js
 log.suppress('debug', 'info');
 var l2 = log.sub('forModuleX').allow('debug');
 l2.debug('works!');
@@ -215,7 +214,7 @@ a.js
 
 When just using suppress/allow on an instance returned directly by `init()` logule will remember the call tree and apply the same rules to the ones further down the tree by default:
 
-````javascript
+````js
 // a.js
 var l = require('logule').init(module, 'app').suppress('debug');
 var b = require('./b');
@@ -236,7 +235,7 @@ With the following code, `a.js` sets the app default of _no debug logging_, whic
 
 Note that any suppress/allow calls to a `sub()` does not propagate:
 
-````javascript
+````js
 // b.js
 var l = require('logule').init(module).sub().allow('debug');
 l.debug('works');
@@ -252,14 +251,14 @@ To strictly enforce suppression of certain levels, enforce log levels in your co
 #### Muting Chatty Modules
 Say you want to mute warnings in the file `c.js` above. If you own the file, you easily just edit the first line to be:
 
-````javascript
+````js
 // c.js
 var l = require('logule').init(module).suppress('warn');
 ````
 
 However, if you don't own the file, perhaps it's deep down in the npm hierarchy for instance, you can propagate more simply from `b.js`.
 
-````javascript
+````js
 // b.js
 var logule = require('logule').init(module).suppress('warn');
 var l = logule.sub().allow('warn');
