@@ -1,6 +1,7 @@
-var logule = require('../')
+var logule = require('../').init(module)
   , test   = require('tap').test
   , levels = ['trace', 'debug', 'info', 'warn', 'error', 'zalgo', 'line']
+  , stderrs = ['error', 'warn', 'zalgo']
   , log = logule.sub('LOGULE').get('info')
   , testMsg = "this is a test message"
   , zalgo = "Ź̩̫͎ͨ̾ͪ̂̿͢AL̡̘̥̅̅̓͒͆ͥ̽GO̥͙̫ͤͤ͊̋ͦ̍͠" // this is the default
@@ -9,17 +10,33 @@ l.suppress.apply(l, levels);
 
 // monkey-patch process.stdout.write to intercept console.log calls
 var hook = function (cb) {
-  var write = process.stdout.write;
+  var writeStdOut = process.stdout.write;
+  //var writeStdErr = process.stderr.write;
   process.stdout.write = cb;
+  //process.stderr.write = cb;
 
   // return an undo damage fn returned
   return function () {
-    process.stdout.write = write;
+    process.stdout.write = writeStdOut;
+    //process.stderr.write = writeStdErr;
   };
 };
 
 
 test("stdout", function (t) {
+  var hook = function (cb) {
+    var writeStdOut = process.stdout.write;
+    var writeStdErr = process.stderr.write;
+    process.stdout.write = cb;
+    process.stderr.write = cb;
+
+    // return an undo damage fn returned
+    return function () {
+      process.stdout.write = writeStdOut;
+      process.stderr.write = writeStdErr;
+    };
+  };
+
   var stdlog = logule.sub('STDOUT')
     , output = [];
 
@@ -188,3 +205,46 @@ test("stdout", function (t) {
   t.end();
 });
 
+/*test("stderr", function (t) {
+  var hook = function (cb) {
+    var writeStdErr = process.stderr.write;
+    process.stderr.write = cb;
+
+    // return an undo damage fn returned
+    return function () {
+      process.stderr.write = writeStdErr;
+    };
+  };
+
+  var stdlog = logule.sub('STDERR')
+    , output = [""];
+
+  var unhook = hook(function (str, enc, fd) {
+    output.push(str);
+  });
+
+  var last = function () {
+    return output[output.length - 1];
+  };
+
+  var lastIncludes = function (x) {
+    return last().indexOf(x) >= 0;
+  };
+
+  levels.forEach(function (lvl) {
+    if (stderrs.indexOf(lvl) >= 0) {
+      stdlog[lvl]("histderr");
+      t.ok(lastInclude("histderr"), "stderr log works")
+      var include = (lvl === 'zalgo') ? zalgo : lvl.toUpperCase();
+      t.ok(lastIncludes(include), "stderr test includes lvl type");
+    }
+    else {
+      stdlog[lvl]("nothere");
+      t.ok(!lastIncludes("nothere"), "stdlog should not log to stderr for this level");
+    }
+  });
+
+  unhook();
+  t.end();
+});
+*/
