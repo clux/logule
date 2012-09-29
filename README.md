@@ -30,6 +30,8 @@ Logule strives to adhere these goals and beyond that tries to maintain a stable 
 * [Namespaces](#namespaces)
 * [Subs](#subs)
 * [Configuration](#configuration)
+  * [Date Formatting](#date-formatting)
+  * [Changing Colors](#changing-colors)
   * [Global Filtration](#global-filtration)
   * [Stream JSON](#stream-json)
 * [API](#api)
@@ -41,6 +43,8 @@ Logule strives to adhere these goals and beyond that tries to maintain a stable 
   * [Suppress](#suppress)
   * [Allow](#allow)
   * [Filtering Branches](#filtering-branches)
+  * [Muting Chatty Modules](#muting-chatty-modules)
+  * [Unmuting New Modules](#unmuting-new-modules)
 * [Installation](#installation)
 * [Running Tests](#running-tests)
 * [License](#license)
@@ -85,7 +89,7 @@ A `log.sub()` will maintain the the default namespaces and suppression settings 
 Since the output of `var log = require('logule').init(module)`, `log.sub()` and `log.sub().sub()` (etc) all act similarly and on the same API, the variable `log` will in this document be used to refer to a logger instance that came from any of these origins.
 
 ## Configuration
-Rich configuration of colors, style, date formatting and global suppression of certain log levels are all available via config files. The [default configuration file](https://github.com/clux/logule/blob/master/.logule) results in output looking like the older versions and the images herein.
+Rich configuration of colors, style, date formatting and global suppression of certain log levels are all available via config files. The [default configuration file](https://github.com/clux/logule/blob/master/.logule) (which *contains documentation*) results in output looking like the images herein.
 
 Configs are located via [confortable](https://github.com/clux/confortable). Which is a module that performs priority based config searches. In particular, it is used here with the following path priorities:
 
@@ -96,15 +100,35 @@ Configs are located via [confortable](https://github.com/clux/confortable). Whic
 
 Step 3 enables modules to bundle their own default config which can be overriden by apps by utilizing step 2.
 
-The found config file is merged carefully with the default [bundled config](https://github.com/clux/logule/blob/master/.logule). In particular, one cannot remove the default log levels (lest we break dependency injection).
+The found config file is merged carefully with the default config. In particular, one cannot remove the default log levels (lest we break dependency injection).
 
-#### Global Filtration
+### Date Formatting
+How or if to prepend the date has been the most controversial choice previously made for you in early versions of logule. Those days are now gone, however, and multiple different date formatting types exist.
+
+- 'plain'     -> prepends HH:MM:SS + delimiter via `toLocaleTimeString`
+- 'precision' -> prepends HH:MM:SS:MSS + delimiter via above + padded `getMilliseconds`
+- 'method'    -> prepends the result of any custom method on `Date.prototype`
+- 'none'      -> Nothing prepended. Log output starts at type, e.g. the `INFO` part.
+- 'custom'    -> Allows four extra settings.
+
+If 'custom' set, you can also prepend the date to either 'plain' or 'precision', i.e. prepend YYYY-MM-DD, possibly reversing it if you're american, and possibly changing the delimiter.
+
+### Changing Colors
+The following options affect output colors:
+
+- 'prefixCol' - namespace
+- 'dateCol' - time and date
+- 'lineCol' - location in .line()
+
+Additionally 'levels' define the color of the delimiter in each log method.
+
+### Global Filtration
 Set the `suppress` flag to globally turn all listed log methods into chaining no-ops.
 Alternatively ist the exceptions under `allow` instead and set `useAllow` to `true`.
 For branch based suppression see allow and suppress.
 TODO: links
 
-#### Stream JSON
+### Stream JSON
 If `logFile` is filled in, this file will be appended to with JSON log messages (one message per line). Thus, you can read the file and split by newline, or watch the file and emit/filter based on each JSON line you receive.
 
 The individual JSON messages use the current format:
@@ -193,12 +217,12 @@ When just using suppress/allow on an instance returned directly by `init()` logu
 
 ````javascript
 // a.js
-var l = require('logule').init(module).suppress('debug');
+var l = require('logule').init(module, 'app').suppress('debug');
 var b = require('./b');
 
 // b.js
 var l = require('logule').init(module);
-var c = require('./c')
+var c = require('./c');
 l.debug('suppressed');
 l.allow('debug');
 l.debug('works');
@@ -208,7 +232,7 @@ var l = require('logule').init(module);
 l.debug('works');
 ````
 
-With the following code, `a.js` sets the app default of _no debug logging_, which is overridden by `b.js`, and propagates to `c.js`.
+With the following code, `a.js` sets the app default of _no debug logging_, which is overridden by `b.js`, and propagates to `c.js`. Note that the `app` namespace set in `a.js` propagates down to both `b.js` and `c.js`.
 
 Note that any suppress/allow calls to a `sub()` does not propagate:
 
@@ -225,6 +249,29 @@ l.debug('suppressed');
 In short tree based log levels is the safe, *overridable version* of log levels.
 To strictly enforce suppression of certain levels, enforce log levels in your config files.
 
+#### Muting Chatty Modules
+Say you want to mute warnings in the file `c.js` above. If you own the file, you easily just edit the first line to be:
+
+````javascript
+// c.js
+var l = require('logule').init(module).suppress('warn');
+````
+
+However, if you don't own the file, perhaps it's deep down in the npm hierarchy for instance, you can propagate more simply from `b.js`.
+
+````javascript
+// b.js
+var logule = require('logule').init(module).suppress('warn');
+var l = logule.sub().allow('warn');
+var c = require('./c');
+l.debug('suppressed');
+l.warn('works');
+````
+
+Here we suppress the main logger from `b.js` (the one from `init`), but allow warnings to a `sub` that will be used inside this file to preserve the same behaviour inside `b.js`.
+
+#### Unmuting New Modules
+Essentially the inverse of [Muting chatty modules](#muting-chatty-modules), here we allow one level above or in the file itself if we own it.
 
 ## Installation
 
