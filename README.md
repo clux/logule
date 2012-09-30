@@ -72,11 +72,10 @@ To add a namespace to this module, add a second parameter to `init()`.
 log = require('logule').init(module, 'BUILD');
 log.trace("Trying to compile main.js");
 log.error("Failed");
-return;
-// log.info("Shutting down") called in parent module which lacks the BUILD namespace
 ```
 
 ![one namespace output!](https://github.com/clux/logule/raw/master/imgs/output.png)
+In this case, the extra output came from the parent module one file up the call tree.
 
 Namespaces nest and are assigned in the order of registration (`init()` calls) to match the call tree. See [Filtering Branches](#filtering-branches) for an example.
 
