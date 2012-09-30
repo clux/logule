@@ -72,7 +72,8 @@ To add a namespace to this module, add a second parameter to `init()`.
 log = require('logule').init(module, 'BUILD');
 log.trace("Trying to compile main.js");
 log.error("Failed");
-logule.info("Shutting down")
+return
+// log.info("Shutting down") called in parent module which lacks the BUILD namespace
 ```
 
 ![one namespace output!](https://github.com/clux/logule/raw/master/imgs/output.png)
@@ -152,7 +153,7 @@ The methods available on a logger instance are: `trace`, `debug`, `info`, `line`
 
 The mystical `zalgo` and `line` provide some specialized logic however:
 
-#### line()
+### line()
 Line is prepends the filename and line of caller (as a namespace). It fetches this info from the stack directly.
 
 ```js
@@ -164,14 +165,14 @@ log.line();
 
 ![line output!](https://github.com/clux/logule/raw/master/imgs/line.png)
 
-#### zalgo()
+### zalgo()
 H̸̡̪̯ͨ͊̽̅̾̎Ȩ̬̩̾͛ͪ̈́̀́͘ ̶̧̨̱̹̭̯ͧ̾ͬC̷̙̲̝͖ͭ̏ͥͮ͟Oͮ͏̮̪̝͍M̲̖͊̒ͪͩͬ̚̚͜Ȇ̴̟̟͙̞ͩ͌͝S̨̥̫͎̭ͯ̿̔̀ͅ
 
 ```js
 log.zalgo('core melting')
 ```
 
-#### get()
+### get()
 A debug module may only need `log.debug`. You can save typing, and enforce this behaviour by calling `.get('debug')` on an instance, to return the correctly bound instance method to pass down.
 
 ```js
@@ -181,7 +182,7 @@ dbg("works like log.debug - but nothing else accessible via this non-chainging v
 
 Note that if `log` have muted or suppressed (i.e. in the config) debug - then you would only get a noop from `.get('debug')`.
 
-#### mute()
+### mute()
 Suppress logs for passed in methods.
 
 ```js
@@ -189,7 +190,7 @@ log.mute('debug', 'info');
 log.warn('works').info('muted').error('works').debug('muted');
 ```
 
-#### unmute()
+### unmute()
 Unmutes logs for passed in methods.
 
 ```js
@@ -199,7 +200,7 @@ l2.debug('works!');
 log.debug('muted');
 ```
 
-#### muteOnly()
+### muteOnly()
 A convenience for muting all levels passed in, and unmuting all others.
 
 ```js
@@ -207,7 +208,7 @@ log.muteOnly('debug', 'trace'); // only trace & debug muted
 log.muteOnly(); // muteOnly nothing === unmute everything
 ```
 
-#### unmuteOnly()
+### unmuteOnly()
 A convenience for unmuting all levels passed in, and muting the others.
 
 ```js
@@ -215,11 +216,11 @@ log.unmuteOnly('error'); // only errors unmuted
 log.unmuteOnly(); // unmuteOnly nothing === mute everything
 ```
 
-### Branch Based Filtration
+## Branch Based Filtration
 Controlling global levels is done via config files, but the levels not globally suppressed therein can temporarily muted/unmuted at any branch point and these settings will propagate down the call tree.
 
 
-#### Filtering Branches
+### Filtering Branches
 The examples for mute/unmute only shows the basic API for using subs. You do not have to create subs and pass them down via dependency injection. You can of course do this, but if you write short modules, it's generally easier to let `init()` do the heavy lifting.
 
 To get the most out of call tree filtration consider the following example of an application structure:
@@ -267,7 +268,7 @@ l.debug('still muted');
 In short tree based log levels is the safe, *overridable version* of log levels.
 To enforce strict suppression of certain levels, the config file is the way to go.
 
-#### Muting Chatty Modules
+### Muting Chatty Modules
 Say you want to mute warnings in the file `c.js` above. If you own the file, you easily just edit the first line to be:
 
 ```js
@@ -287,7 +288,7 @@ l.warn('unmuted, but down the call tree it is muted');
 
 Here we mute the main logger from `b.js` (the one from `init`), but unmute warnings to a `sub` that will be used inside this file to preserve the same behaviour inside `b.js` only.
 
-#### Unmuting New Modules
+### Unmuting New Modules
 Essentially the inverse of [Muting chatty modules](#muting-chatty-modules), here we unmute one file above or in the file itself if we own it.
 
 ## Installation
