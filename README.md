@@ -72,7 +72,7 @@ To add a namespace to this module, add a second parameter to `init()`.
 log = require('logule').init(module, 'BUILD');
 log.trace("Trying to compile main.js");
 log.error("Failed");
-return
+return;
 // log.info("Shutting down") called in parent module which lacks the BUILD namespace
 ```
 
@@ -94,7 +94,7 @@ A `log.sub()` will maintain the the default namespaces and mute settings of `log
 Since the output of `var log = require('logule').init(module)`, `log.sub()` and `log.sub().sub()` (etc) all act similarly and on the same API, the variable `log` will in this document be used to refer to a logger instance that came from any of these origins.
 
 ## Configuration
-Rich configuration of colors, style, date formatting and global muting of certain log levels are all available via config files. The [default configuration file](https://github.com/clux/logule/blob/master/.logule) (which *contains documentation*) results in output looking like the images herein.
+Rich configuration of colors, style, date formatting and global muting of certain log levels are all available via config files. The [default configuration file](https://github.com/clux/logule/blob/master/lib/.logule) (which *contains documentation*) results in output looking like the images herein.
 
 Configs are located via [confortable](https://github.com/clux/confortable). Which is a module that performs priority based config searches. In particular, it is used here with the following path priorities:
 
@@ -110,11 +110,11 @@ The found config file is merged carefully with the default config, so you don't 
 ### Date Formatting
 How or if to prepend the date has been the most controversial choice previously made for you in early versions of logule. Those days are now gone, however, and multiple different date formatting types exist.
 
-- `plain`     -> prepends HH:MM:SS + delimiter via `toLocaleTimeString`
-- `precision` -> prepends HH:MM:SS:MSS + delimiter via above + padded `getMilliseconds`
-- `method`    -> prepends the result of any custom method on `Date.prototype`
-- `none`      -> Nothing prepended. Log output starts at type, e.g. the `INFO` part.
-- `custom`    -> Allows four extra settings.
+- `plain`     - prepends HH:MM:SS + delimiter via `toLocaleTimeString`
+- `precision` - prepends HH:MM:SS:MSS + delimiter via above + padded `getMilliseconds`
+- `method`    - prepends the result of any custom method on `Date.prototype`
+- `none`      - nothing prepended; log output starts at type, e.g. the `INFO` part
+- `custom`    - allows four extra settings
 
 If `custom` set, you can also prepend the date to either `plain` or `precision`, i.e. prepend YYYY-MM-DD, possibly reversing it if you're american, and possibly changing the delimiter.
 
@@ -122,8 +122,8 @@ If `custom` set, you can also prepend the date to either `plain` or `precision`,
 The following options affect output colors:
 
 - `prefixCol` - namespace
-- `dateCol` time and date
-- `lineCol` location in .line()
+- `dateCol`   - time and date
+- `lineCol`   - location in .line()
 
 Additionally `levels` define the color of the delimiter in each log method.
 Every string used to describe colors must be exported by the `colors` module to work.
