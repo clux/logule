@@ -20,7 +20,7 @@ as well as being able to configure *how* your:
 - app logs by default (perhaps overriding individual module defaults)
 - apps log by default (by providing sensible overall configs)
 
-Manipulating these settings should be super easy as it's most useful during development and debug sessions where time is of the essence.
+Manipulating these settings should be super easy, as it's most useful during development and debug sessions where time is of the essence.
 
 Logule strives to adhere these goals and beyond that tries to maintain a stable API. Features so far has been greatly improved via issues/pull requests contributions, so please follow this path if there is anything you feel deserves attention.
 
