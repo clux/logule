@@ -75,6 +75,7 @@ log.error("Failed");
 ```
 
 ![one namespace output!](https://github.com/clux/logule/raw/master/imgs/output.png)
+
 In this case, the extra output came from the parent module one file up the call tree.
 
 Namespaces nest and are assigned in the order of registration (`init()` calls) to match the call tree. See [Filtering Branches](#filtering-branches) for an example.

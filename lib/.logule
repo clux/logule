@@ -25,11 +25,9 @@ module.exports = {
 
   // extra styling
   // critical errors in bold by default
-, bold      : ['error']
+, bold      : ['error', 'zalgo']
   // padding of the first namespace
 , pad       :  0
-  // when including the zalgo level, what level key to use
-, zalgo     : 'Ź̩̫͎ͨ̾ͪ̂̿͢AL̡̘̥̅̅̓͒͆ͥ̽GO̥͙̫ͤͤ͊̋ͦ̍͠' // unobtrusive alternating letter zalgification default
 
 , formatting: {
   // Date formatting type
