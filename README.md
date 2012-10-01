@@ -94,7 +94,7 @@ A `log.sub()` will maintain the the default namespaces and mute settings of `log
 Since the output of `var log = require('logule').init(module)`, `log.sub()` and `log.sub().sub()` (etc) all act similarly and on the same API, the variable `log` will in this document be used to refer to a logger instance that came from any of these origins.
 
 ## Configuration
-Rich configuration of colors, style, date formatting and global muting of certain log levels are all available via config files. The [default configuration file](https://github.com/clux/logule/blob/master/lib/.logule) (which *contains documentation*) results in output looking like the images herein.
+Rich configuration of colors, style, date formatting and global muting of certain log levels are all available via config files. The [default configuration file](https://github.com/clux/logule/blob/master/.logule) (which *contains documentation*) results in output looking like the images herein.
 
 Configs are located via [confortable](https://github.com/clux/confortable). Which is a module that performs priority based config searches. In particular, it is used here with the following path priorities:
 
