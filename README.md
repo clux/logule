@@ -295,7 +295,7 @@ Essentially the inverse of [Muting chatty modules](#muting-chatty-modules), here
 ## Colors Module and String.Prototype
 While `logule` depends on `colors`, it does not depend on the (non-enumerable) getters it defines on `String.prototype`. If you do not wish these global getters to pollute your code, you may simply add `Object.freeze(String.prototype)` before your first call to `require('logule')`.
 
-Given the rampant modification of native prototypes, this may be a good thing to do for multiple types anyway..
+Given the rampant modification of native prototypes, this may be a good thing to do for [multiple types](https://gist.github.com/3823024) anyway..
 
 ## Installation
 
