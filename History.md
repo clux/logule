@@ -1,4 +1,4 @@
-1.0.1 / 2012-XX-XX
+1.0.1 / 2012-10-02
 ==================
   * Documentation clean up
   * DI Safety: disallow new method creation from config
