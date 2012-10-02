@@ -3,7 +3,7 @@
   * Documentation clean up
   * DI Safety: disallow new method creation from config
   * zalgo styling: make it less serious with gratuitous amounts of syntax
-  * Misc code clean-ups
+  * Misc code clean-ups + performance tweaks
 
 1.0.0 / 2012-09-29
 ==================
