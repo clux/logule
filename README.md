@@ -47,7 +47,7 @@ Logule strives to adhere these goals and beyond that tries to maintain a stable 
   * [Filtering Branches](#filtering-branches)
   * [Muting Chatty Modules](#muting-chatty-modules)
   * [Unmuting New Modules](#unmuting-new-modules)
-* [Colors Module and String.prototype](#colors-module-and-string.prototype)
+* [Colors Module and String.prototype](#colors-module-and-stringprototype)
 * [Installation](#installation)
 * [Running Tests](#running-tests)
 * [License](#license)
@@ -293,7 +293,7 @@ Here we mute the main logger from `b.js` (the one from `init`), but unmute warni
 Essentially the inverse of [Muting chatty modules](#muting-chatty-modules), here we unmute one file above or in the file itself if we own it.
 
 ## Colors Module and String.Prototype
-While `logule` depends on `colors`, it does not depend on the (non-enumerable) getters it defines on `Object.prototype`. If you do not wish these global getters to pollute your code, you may simply add `Object.freeze(String.prototype)` before your first call to `require('logule')`.
+While `logule` depends on `colors`, it does not depend on the (non-enumerable) getters it defines on `String.prototype`. If you do not wish these global getters to pollute your code, you may simply add `Object.freeze(String.prototype)` before your first call to `require('logule')`.
 
 Given the rampant modification of native prototypes, this may be a good thing to do for multiple types anyway..
 
