@@ -22,7 +22,9 @@ as well as being able to configure *how* your:
 
 Manipulating these settings should be super easy, as it's most useful during development and debug sessions where time is of the essence.
 
-Logule strives to adhere these goals and beyond that tries to maintain a stable API. Features so far has been greatly improved via issues/pull requests contributions, so please follow this path if there is anything you feel deserves attention.
+Finally, you should be able to get trace/debug messages from a module that's not behaving correctly, without spamming the shit out of people not using logule!
+
+Logule strives to adhere these goals and beyond that has since 1.0  maintained a stable API. Features so far has been greatly improved via issues/pull requests contributions, so please follow this path if there is anything you feel deserves attention.
 
 ## Index
 
@@ -47,7 +49,7 @@ Logule strives to adhere these goals and beyond that tries to maintain a stable 
   * [Filtering Branches](#filtering-branches)
   * [Muting Chatty Modules](#muting-chatty-modules)
   * [Unmuting New Modules](#unmuting-new-modules)
-* [Colors Module and String.prototype](#colors-module-and-stringprototype)
+* [Colors](#colors)
 * [Installation](#installation)
 * [Running Tests](#running-tests)
 * [License](#license)
@@ -57,11 +59,10 @@ Require a logule instance for the current file and use it everywhere inside it.
 
 ```js
 var log = require('logule').init(module);
-log
-  .error("this is an error message")
-  .warn("warning")
-  .info("info msg")
-  .debug("chained %s", "debug");
+log.error("this is an error message")
+log.warn("<- heed this")
+log.info("info %s %d %j", "message", 1, {a: 2})
+log.debug("this message has to be turned on");
 ```
 
 ![simple output!](https://github.com/clux/logule/raw/master/imgs/outputsimple.png)
@@ -77,7 +78,7 @@ log.error("Failed");
 
 ![one namespace output!](https://github.com/clux/logule/raw/master/imgs/output.png)
 
-In this case, the extra output came from the parent module one file up the call tree.
+In this case, the extra output came from the parent module one file up the call tree and `trace` messages were turned on.
 
 Namespaces nest and are assigned in the order of registration (`init()` calls) to match the call tree. See [Filtering Branches](#filtering-branches) for an example.
 
@@ -133,6 +134,7 @@ Every string used to describe colors must be exported by the `colors` module to 
 Set the `suppress` flag to globally turn all listed log methods into chaining no-ops.
 Alternatively list the exceptions under `allow` instead and set `useAllow` to `true`.
 See the [Branch based filtration](#branch-based-filtration) section for more granular control.
+By default, `trace`, `debug` and `line` messages are suppressed.
 
 ### Stream JSON
 If `logFile` is filled in, this file will be appended to with JSON log messages (one message per line). Thus, you can read the file and split by newline, or watch the file and emit/filter based on each JSON line you receive.
@@ -152,6 +154,8 @@ The individual JSON messages use the current format:
 ### Defaults
 The methods available on a logger instance are: `trace`, `debug`, `info`, `line`, `warn`, `error`, and `zalgo`. They only vary their delimiter color and some might be boldened depending on the config setting.
 
+Note that `trace` and `debug` never outputs anything by default. It must be enabled in the config!
+
 The mystical `zalgo` and `line` provide some specialized logic however:
 
 ### line()
@@ -166,12 +170,16 @@ log.line();
 
 ![line output!](https://github.com/clux/logule/raw/master/imgs/line.png)
 
+In this case, config suppression was disabled.
+
 ### zalgo()
-H̸̡̪̯ͨ͊̽̅̾̎Ȩ̬̩̾͛ͪ̈́̀́͘ ̶̧̨̱̹̭̯ͧ̾ͬC̷̙̲̝͖ͭ̏ͥͮ͟Oͮ͏̮̪̝͍M̲̖͊̒ͪͩͬ̚̚͜Ȇ̴̟̟͙̞ͩ͌͝S̨̥̫͎̭ͯ̿̔̀ͅ
+[H̸̡̪̯ͨ͊̽̅̾̎Ȩ̬̩̾͛ͪ̈́̀́͘ ̶̧̨̱̹̭̯ͧ̾ͬC̷̙̲̝͖ͭ̏ͥͮ͟Oͮ͏̮̪̝͍M̲̖͊̒ͪͩͬ̚̚͜Ȇ̴̟̟͙̞ͩ͌͝S̨̥̫͎̭ͯ̿̔̀ͅ](https://github.com/clux/dye#zalgo)
 
 ```js
 log.zalgo('core melting')
 ```
+
+![zalgo output!](https://github.com/clux/logule/raw/master/imgs/zalgo.png)
 
 ### get()
 A debug module may only need `log.debug`. You can save typing, and enforce this behaviour by calling `.get('debug')` on an instance, to return the correctly bound instance method to pass down.
@@ -181,31 +189,33 @@ var dbg = log.get('debug');
 dbg("works like log.debug - but nothing else accessible via this non-chainging var");
 ```
 
-Note that if `log` have muted or suppressed (i.e. in the config) debug - then you would only get a noop from `.get('debug')`.
+Note that if `debug` remains suppressed in the config, or it's `muted` somewhere up the call tree - then you would only get a noop from `.get('debug')`.
 
 ### mute()
 Suppress logs for passed in methods.
 
 ```js
-log.mute('debug', 'info');
-log.warn('works').info('muted').error('works').debug('muted');
+log.mute('warn', 'info');
+log.info('muted').warn('muted').error('works');
 ```
 
 ### unmute()
 Unmutes logs for passed in methods.
 
 ```js
-log.mute('debug', 'info');
-var l2 = log.sub('forModuleX').unmute('debug');
-l2.debug('works!');
-log.debug('muted');
+log.mute('warn', 'info');
+var l2 = log.sub('forModuleX').unmute('warn');
+l2.warn('works!');
+log.warn('muted');
 ```
+
+Remember that you cannot unmute `trace` and `debug` unless it has been globally unsuppressed in the active .logule config.
 
 ### muteOnly()
 A convenience for muting all levels passed in, and unmuting all others.
 
 ```js
-log.muteOnly('debug', 'trace'); // only trace & debug muted
+log.muteOnly('debug', 'trace'); // unmutes everything except trace & debug
 log.muteOnly(); // muteOnly nothing === unmute everything
 ```
 
@@ -213,7 +223,7 @@ log.muteOnly(); // muteOnly nothing === unmute everything
 A convenience for unmuting all levels passed in, and muting the others.
 
 ```js
-log.unmuteOnly('error'); // only errors unmuted
+log.unmuteOnly('error'); // mutes everything except error
 log.unmuteOnly(); // unmuteOnly nothing === mute everything
 ```
 
@@ -236,66 +246,63 @@ When just using mute/unmute on an instance returned directly by `init()` logule 
 
 ```js
 // a.js
-var l = require('logule').init(module, 'app').mute('debug');
+var l = require('logule').init(module, 'app').mute('info');
 var b = require('./b');
 
 // b.js
 var l = require('logule').init(module);
 var c = require('./c');
-l.debug('muted');
-l.unmute('debug');
-l.debug('works');
+l.info('muted');
+l.unmute('info');
+l.info('works');
 
 // c.js
 var l = require('logule').init(module, 'leaf');
-l.debug('works');
+l.info('works');
 ```
 
-With the following code, `a.js` sets the app default of _no debug logging_, which is overridden by `b.js`, and propagates to `c.js`. Note that the `app` namespace set in `a.js` propagates down to both `b.js` and `c.js`, but `c.js` will show two namespaces: `app` and `leaf` provided the config setting `nesting >= 2`.
+With the following code, `a.js` sets the an app default of _no info messages_, which is overridden by `b.js`, and propagates to `c.js`. Note that the `app` namespace set in `a.js` propagates down to both `b.js` and `c.js`, but `c.js` will show two namespaces: `app` and `leaf` provided the config setting `nesting >= 2`.
 
-Note that any mute/unmute calls to a `sub()` does not propagate to other files:
+Note that any `mute`/`unmute` calls to a `sub()` does not propagate to other files:
 
 ```js
 // a.js as above
 // b.js
-var l = require('logule').init(module).sub().unmute('debug');
-l.debug('works');
+var l = require('logule').init(module).sub().unmute('info');
+l.info('works');
 
 // c.js
 var l = require('logule').init(module);
-l.debug('still muted');
+l.info('still muted');
 ```
 
 In short tree based log levels is the safe, *overridable version* of log levels.
-To enforce strict suppression of certain levels, the config file is the way to go.
+To enforce strict suppression of certain levels, the config file is the way to go, and by default, the config prevents unmuting of `trace` and `debug`.
 
 ### Muting Chatty Modules
 Say you want to mute warnings in the file `c.js` above. If you own the file, you easily just edit the first line to be:
 
 ```js
 // c.js
-var l = require('logule').init(module).mute('warn');
+var l = require('logule').init(module).mute('warn', 'info');
 ```
 
 However, if you don't own the file, perhaps it's deep down in the npm hierarchy for instance, you can propagate more simply from `b.js`.
 
 ```js
 // b.js
-var l = require('logule').init(module).mute('warn').sub().unmute('warn');
+var l = require('logule').init(module).mute('warn', 'info').sub().muteOnly();
 var c = require('./c');
-l.debug('muted');
 l.warn('unmuted, but down the call tree it is muted');
 ```
 
-Here we mute the main logger from `b.js` (the one from `init`), but unmute warnings to a `sub` that will be used inside this file to preserve the same behaviour inside `b.js` only.
+Here we mute the main logger from `b.js` (the one from `init`), but unmute everything on a `sub` that will be used inside this file to preserve the same behaviour inside `b.js` only.
 
 ### Unmuting New Modules
-Essentially the inverse of [Muting chatty modules](#muting-chatty-modules), here we unmute one file above or in the file itself if we own it.
+Essentially the inverse of [Muting chatty modules](#muting-chatty-modules), here we unmute one file above or in the file itself if we own it. Note that modules can safely write `trace` and `debug` messages since the default config mutes these.
 
-## Colors Module and String.Prototype
-While `logule` depends on `colors`, it does not depend on the (non-enumerable) getters it defines on `String.prototype`. If you do not wish these global getters to pollute your code, you may simply add `Object.freeze(String.prototype)` before your first call to `require('logule')`.
-
-Given the rampant modification of native prototypes, this may be a good thing to do for [multiple types](https://gist.github.com/3823024) anyway..
+## Colors
+The ASNI color code wrapping and zalgolizer is provided by [dye](https://github.com/clux/dye), wheras it used to rely on `colors`. Dye does not introduce implicit global dependencies on `String.prototype`, and provides more sensible zalgolizations.
 
 ## Installation
 

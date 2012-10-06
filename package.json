@@ -22,9 +22,9 @@
     "test": "tap ./test"
   },
   "dependencies": {
-    "colors": "~0.5.1",
+    "dye": "~0.1.0",
     "autonomy": "~0.3.0",
-    "subset": "~0.1.0",
+    "subset": "~0.1.1",
     "confortable": "~0.1.4"
   },
   "devDependencies": {

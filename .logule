@@ -51,9 +51,9 @@ module.exports = {
 , nesting   : 3       // maxmimum number of nested namespaces shown in output
 
   // global log levels
-, useAllow  : false   // if true, use 'allow' option, else use 'suppress' option
-, suppress  : []      // every method on this list is suppressed
-, allow     : []      // every method in (levels \ this list) is suppressed
+, useAllow  : false               // if true, use 'allow' option, else use 'suppress' option
+, suppress  : ['debug', 'trace']  // every method on this list is suppressed
+, allow     : []                  // every method in (levels \ this list) is suppressed
 
   // JSON logging
 , logFile  : null     // path to file (relative to this configs location)

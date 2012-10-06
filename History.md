@@ -1,3 +1,10 @@
+1.1.0 / 2012-10-06
+==================
+  Modules should not say anything when it doesn't need to. This discourages the use of log.trace
+  in free standing modules, which is bad, information is a good thing to have. Solution:
+  * `trace` and `debug` logs are by suppressed in the default config to allow probing of modules that use logule, but still not spam `stdout` by default
+  * `colors` dependency removed. Those who were using the accessors it added to `String.prototype` must require it separately, this behaviour spread implicit dependencies and was not intended.
+
 1.0.1 / 2012-10-02
 ==================
   * Documentation clean up
