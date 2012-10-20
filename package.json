@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "dye": "~0.1.0",
-    "autonomy": "~0.3.0",
+    "autonomy": "~0.4.2",
     "subset": "~0.1.1",
     "confortable": "~0.1.4"
   },

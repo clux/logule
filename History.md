@@ -1,3 +1,7 @@
+1.1.1 / ?
+==================
+  * bump autonomy
+
 1.1.0 / 2012-10-06
 ==================
   Modules should not say anything when it doesn't need to. This discourages the use of log.trace
