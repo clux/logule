@@ -1,30 +1,20 @@
-var logule = require('../').init(module)
+var l = require('../').init(module)
   , test   = require('tap').test
   , levels = ['trace', 'debug', 'info', 'warn', 'error', 'zalgo', 'line']
-  , pubs = ['get', 'mute', 'unmute', 'muteOnly', 'unmuteOnly', 'sub']
-  , l = logule.sub('suppressed');
-l.mute.apply(l, levels); // l is always suppressed
+  , pubs = ['get', 'mute', 'unmute', 'muteOnly', 'unmuteOnly', 'sub'];
 
 test("chaining", function (t) {
   levels.forEach(function (lvl) {
-    var sub = l.sub('wee')
-      , single = sub.get(lvl);
+    // NB: some of the get calls return noop and will never chain
     t.equal(l, l[lvl](1), 'l.' + lvl + " chains");
-    t.equal(l.get(lvl)(1), undefined, "l.get('" + lvl + "') does not chain");
-    t.equal(sub.info('wat'), sub, "sub chains");
-    t.equal(single('wat'), undefined, "sub single returns undefined");
+    t.equal(l.get(lvl)('wat'), undefined, "get " + lvl + " does not chains");
   });
   t.end();
 });
 
 
 test("exports", function (t) {
-  var expectedExports = levels.concat(pubs);
-
   pubs.forEach(function (p) {
-    if (p === 'data') {
-      return;
-    }
     t.ok(l[p] !== undefined, "l." + p + " is exported");
     t.type(l[p], 'function', "l." + p + " is function");
   });
@@ -39,7 +29,6 @@ test("exports", function (t) {
 });
 
 test("subs", function (t) {
-  t.ok(logule === logule, "obvious test");
-  t.ok(logule !== logule.sub(), "logule.sub() does not return this");
+  t.ok(l !== l.sub(), "l.sub() does not return same instance");
   t.end();
 });

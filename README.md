@@ -189,7 +189,9 @@ var dbg = log.get('debug');
 dbg("works like log.debug - but nothing else accessible via this non-chainging var");
 ```
 
-Note that if `debug` remains suppressed in the config, or it's `muted` somewhere up the call tree - then you would only get a noop from `.get('debug')`.
+NB 1: If `debug` is suppressed in the config, or it's `muted` somewhere up the call tree - then `.get('debug')` returns a _noop_.
+
+NB 2: while you could do this with `log.debug.bind(log)`, this would chain and allow modules to break out of the constricted environment.
 
 ### mute()
 Suppress logs for passed in methods.
