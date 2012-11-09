@@ -25,18 +25,21 @@
     "pad"       : 0,
     "delimiter" : " - ",
     "nesting"   : 3,
+    "mutable"   : true,
     "timestamp" : "toLocaleTimeString",
     "suppress"  : ["debug", "trace"]
   },
 
   "filestream": {
     "file"      : null,
+    "mutable"   : true,
     "timestamp" : "toJSON",
     "suppress"  : ["line"]
   },
 
   "stream"    : {
     "name"      : null,
+    "mutable"   : false,
     "suppress"  : ["debug", "trace"]
   }
 }
