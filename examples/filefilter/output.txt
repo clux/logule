@@ -1,0 +1,10 @@
+{"time":"2012-11-11T18:28:58.770Z","level":"info","namespaces":["Ns"],"message":"hi thar"}
+{"time":"2012-11-11T18:28:58.771Z","level":"warn","namespaces":["Ns"],"message":"blaaah"}
+{"time":"2012-11-11T18:28:58.771Z","level":"error","namespaces":[],"message":"fwooarst {\"a\":2}, likeit"}
+{"time":"2012-11-11T18:28:58.772Z","level":"zalgo","namespaces":[],"message":"this is bad, really bad"}
+{"time":"2012-11-11T18:28:58.772Z","level":"line","namespaces":[],"line":"test.js:6","message":""}
+{"time":"2012-11-11T18:28:58.773Z","level":"warn","namespaces":[],"message":"wat 160 ?"}
+{"time":"2012-11-11T18:28:58.773Z","level":"info","namespaces":[],"message":"okok\nokok"}
+{"time":"2012-11-11T18:28:58.773Z","level":"error","namespaces":[],"message":"arst\\n\n arst"}
+{"time":"2012-11-11T18:28:58.773Z","level":"line","namespaces":[],"line":"test.js:10","message":"here i am"}
+{"time":"2012-11-11T18:28:58.773Z","level":"line","namespaces":["WTF"],"line":"test.js:11","message":"where is this? 12 ?"}
