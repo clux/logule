@@ -39,7 +39,7 @@ Logule strives to adhere these goals and beyond that has since 1.0  maintained a
   * [warn()](#warn)
   * [error()](#error)
   * [zalgo()](#zalgo)
-  * [get()](#get)
+  * [get()](#getlevel--namespace)
 * [Mute API](#mute-api)
   * [mute()](#mute)
   * [unmute()](#unmute)
@@ -50,7 +50,7 @@ Logule strives to adhere these goals and beyond that has since 1.0  maintained a
     * [stdout](#stdout)
     * [Emitter](#emitter)
     * [Filestream](#filestream)
-  * [Style & Formatting](#style-formatting)
+  * [Style & Formatting](#style--formatting)
   * [Timestamps](#timestamps)
   * [Global Suppression](#global-suppression)
 * [Branch Based Filtration](#branch-based-filtration)
@@ -236,7 +236,7 @@ All logs are by default written directly to `process.stdout`
 #### Emitter
 If `emitter` has an `enabled` attribute set to `true`, logule will expose an `EventEmitter` instance on `require('logule').stream`.
 
-Then you can listen to `"log"` events like this:
+Then you can listen to `"log"` events:
 
 ```js
 var logule = require('logule');
@@ -254,7 +254,7 @@ The types of the keys in `obj` are as follows:
   time : Date
   level: String
   namespaces : Array of Strings
-  message : StringStrings
+  message : String
 }
 ```
 
@@ -279,7 +279,7 @@ Where the `time` value may differ depending on the `timestamp` config option.
 NB: A `"line"` key is present if level is `"line"` like in the EventEmitter.
 
 ### Style & Formatting
-The first four blocks in the default config describes the default style set used by the `stdout` transport and are all of the form `levelName : fn` where `fn` is any function in the module [dye](https://github.com/clux/dye). Functions can even be composed by delimiting them with a dot; e.g. `bold.blue`.
+The [first four blocks](https://github.com/clux/logule/blob/master/.logule.json#L2-22) in the default config describes the default style set used by the `stdout` transport and are all of the form `levelName : fn` where `fn` is any function in the module [dye](https://github.com/clux/dye). Functions can even be composed by delimiting them with a dot; e.g. `bold.blue`.
 
 The `delimiters` object contains the subtle default styling of the delimiters joining the optional timestamp, the log level, the optional namespaces and the message.
 
@@ -317,14 +317,14 @@ Example of using the custom mode:
 
 This prepends the date, in the form YYYY-MM-DD (i.e. normal non-reversed european style), and adds the timestamp after the date without precision (i.e. just `toLocaleTimeString`).
 
-Most sensible `Date` methods are:
+Most sensible methods on `Date.prototype` are:
 
-- `toJSON`
+- `toJSON` - default for file
 - `valueOf`
-- `toLocaleTimeString`
+- `toLocaleTimeString` - default for stdout
 - `toGMTString`
 
-Note that the first two can be perfectly serialized/deserialized with `Date.parse` and are thusly a good format for the streaming JSON logs.
+Note that the first two can be perfectly serialized/deserialized with `Date.parse` and are thusly a good format for the filestream JSON transport.
 
 ### Global Suppression
 Set the `suppress` flag to globally turn all listed log methods into chaining no-ops.
@@ -336,7 +336,7 @@ By default, `trace` and `debug` messages are suppressed.
 ## Branch Based Filtration
 Controlling global levels is done via config files, but the levels not globally suppressed therein can temporarily muted/unmuted at any branch point and these settings will propagate down the call tree.
 
-**NB: The following techniques require your transports to be `mutable` in the config**
+**NB: The following techniques require your disired transport(s) to be `mutable` in the config.**
 
 ### Filtering Branches
 To get the most out of call tree filtration consider the following example of an application structure:
@@ -396,15 +396,31 @@ However, if you don't own the file, perhaps it's deep down in the npm hierarchy 
 
 ```js
 // b.js
-var l = require('logule').init(module).mute('warn', 'info').sub().muteOnly();
+var l = require('logule').init(module).mute('warn', 'info').sub().unmute('warn', 'info');
 var c = require('./c');
 l.warn('unmuted, but down the call tree it is muted');
 ```
 
-Here we mute the main logger from `b.js` (the one from `init`), but unmute everything on a `sub` that will be used inside this file to preserve the same behaviour inside `b.js` only.
+Here we mute main logger from `b.js` (the one from `init`), but unmute a `sub` that will be used inside this file to preserve the same behaviour inside `b.js` only.
 
 ### Unmuting New Modules
-Essentially the inverse of [Muting chatty modules](#muting-chatty-modules), here we unmute one file above or in the file itself if we own it. Note that modules can safely write `trace` and `debug` messages since the default config mutes these.
+Essentially the reverse process of [Muting chatty modules](#muting-chatty-modules), there are two cases, you own the file c.js (modify imports line to mute it):
+
+```js
+// c.js
+var l = require('logule').init(module, 'leaf').unmute('info');
+l.info('works');
+```
+
+Or if you don't own the file (so unmute above in the hierarchy):
+
+```js
+// b.js
+var l = require('logule').init(module).unmute('info').sub().mute('info');
+l.info('works');
+```
+
+This preserves muting of `b.js`, but opens up for its descendants.
 
 ## Colors
 The ASNI color code wrapping and zalgolizer is provided by [dye](https://github.com/clux/dye), wheras it used to rely on `colors`. Dye does not introduce implicit global dependencies on `String.prototype`, and provides more sensible zalgolizations.
@@ -412,7 +428,7 @@ The ASNI color code wrapping and zalgolizer is provided by [dye](https://github.
 ## npm Usage
 When logging with `logule >=2` inside an npm published library/executable, the practice is to put `logule` inside `package.json` `peerDependencies` and NOT the normal `dependencies`. This ensures all modules use the same code and thus logule can encapsulate everything needed to process ALL the logs an application uses. Logule's API is stable, so simply restricting to `"logule": "~2"` will suffice.
 
-In `~1`, bundling of separate copies per npm module was the standard and so logule then adopted the method of communicating with other copies via `process.logule` without having one central place where all logs went through. Ultimately, decisions were being made through the config so this worked well.
+In `"logule": "~1"`, bundling of separate copies per npm module was the standard and so logule then adopted the method of communicating with other copies via `process.logule` to compensate for not having any one central piece of code where all logs went through. Ultimately, decisions were being made on behalf of the config so this worked well.
 
 ## Installation
 
