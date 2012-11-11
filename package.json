@@ -1,7 +1,7 @@
 {
   "author": "Eirik Albrigtsen <analsandblaster@gmail.com>",
   "name": "logule",
-  "description": "An advanced console logging library",
+  "description": "A multi-transport, peer-dependent logging library",
   "version": "1.1.0",
   "repository": {
     "type": "git",
@@ -9,11 +9,13 @@
   },
   "main": "lib/logule.js",
   "engines": {
-    "node": ">=0.6.0"
+    "node": ">=0.8"
   },
   "keywords": [
     "stdout",
+    "emitter",
     "json",
+    "file",
     "branch",
     "filtration",
     "configurable"
@@ -24,8 +26,9 @@
   "dependencies": {
     "dye": "~0.1.0",
     "autonomy": "~0.4.2",
-    "subset": "~0.1.1",
-    "confortable": "~0.1.4"
+    "subset": "~0.1.2",
+    "confortable": "~0.2.0",
+    "typr": "~0.2.0"
   },
   "devDependencies": {
     "tap": "~0.3.1"
