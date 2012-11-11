@@ -34,12 +34,12 @@
     "file"      : null,
     "mutable"   : true,
     "timestamp" : "toJSON",
-    "suppress"  : ["line"]
+    "suppress"  : []
   },
 
-  "stream"    : {
-    "name"      : null,
+  "emitter"  : {
+    "enabled"   : true,
     "mutable"   : false,
-    "suppress"  : ["debug", "trace"]
+    "suppress"  : []
   }
 }
