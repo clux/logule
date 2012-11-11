@@ -1,14 +1,22 @@
-1.1.1 / ?
+2.0.0 / 2012-11-XX
 ==================
-  * bump autonomy
+  * config rewritten nicely in JSON and must have the `.json` extension
+  * if you rely on modules using the older config files leave your old config intact until they upgrade (all my modules will be updatet within the hour)
+  * rely on `peerDependencies` in logule-requiring modules rather than try to communicate across compatible copies of logule - this **removes global usage by forcing the user to decide**
+  * the new `.logule.json` is mostly similar, but some changes are required - the changes are mostly clear from the new default config, but for the new/unobvious attributes, look them up in the new readme
+  * expose an `EventEmitter` as the third optional transport for people who would like full control (and are stuck with logule because of module deps, but would like to use something else)
+  * all transports are muted/suppressed individually now!
+  * Namespaces can now be disabled with `nesting` set to zero
+  * Fixed Issue 13: line logs with colored strings to file
+  * Fixed Issue 14: .get() did not log to file if level was muted.
+  * No double `util.format.apply` via `console.log` by writing directly to `process.stdout`
 
 1.1.0 / 2012-10-06
 ==================
-  Modules should not say anything when it doesn't need to. This discourages the use of log.trace
-  in free standing modules, which is bad, information is a good thing to have. Solution:
+  Modules should not say anything when it doesn't need to. This discourages the use of log.trace in free standing modules, which is bad, information is a good thing to have. Solution:
   * `trace` and `debug` logs are by suppressed in the default config to allow probing of modules that use logule, but still not spam `stdout` by default
   * `colors` dependency removed. Those who were using the accessors it added to `String.prototype` must require it separately, this behaviour spread implicit dependencies and was not intended.
-  * fix a bug where values on `process.logule` were being overwritten due to improper serialization
+  * fix a critical bug where values on `process.logule` were being overwritten due to improper serialization (deprecates 1.0.X)
 
 1.0.1 / 2012-10-02
 ==================
