@@ -38,7 +38,7 @@
   },
 
   "emitter"  : {
-    "enabled"   : true,
+    "enabled"   : false,
     "mutable"   : false,
     "suppress"  : []
   }
