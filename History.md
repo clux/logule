@@ -1,4 +1,4 @@
-2.0.0 / 2012-11-XX
+2.0.0 / 2012-11-14
 ==================
   * config rewritten nicely in JSON and must have the `.json` extension
   * if you rely on modules using the older config files leave your old config intact until they upgrade (all my modules will be updatet within the hour)
