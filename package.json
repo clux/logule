@@ -5,7 +5,7 @@
   "version": "2.0.0",
   "repository": {
     "type": "git",
-    "url": "git://github.com/clux/logule.git"
+    "url": "clux/logule"
   },
   "main": "lib/logule.js",
   "engines": {
@@ -31,7 +31,7 @@
     "typr": "~0.2.0"
   },
   "devDependencies": {
-    "tap": "~0.4"
+    "tap": "~0.4.4"
   },
   "bugs": {
     "url": "http://github.com/clux/logule/issues"

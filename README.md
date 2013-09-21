@@ -1,4 +1,4 @@
-# Logule [![Build Status](https://secure.travis-ci.org/clux/logule.png)](http://travis-ci.org/clux/logule)
+# Logule [![Build Status](https://secure.travis-ci.org/clux/logule.png)](http://travis-ci.org/clux/logule) [![Dependency Status](https://david-dm.org/clux/logule.png)](https://david-dm.org/clux/logule)
 
 Logule is a pretty, but heavily configurable logging utility for nodejs. It allows multiple transports (stdout + JSON filestream + emitted logs) as well as being configurable per user, per app and per module via localized config files.
 
