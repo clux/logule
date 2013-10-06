@@ -251,9 +251,9 @@ The types of the keys in `obj` are as follows:
 
 ```js
 {
-  time : Date
-  level: String
-  namespaces : Array of Strings
+  time : Date,
+  level: String,
+  namespaces : [String],
   message : String
 }
 ```
