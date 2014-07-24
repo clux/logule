@@ -43,7 +43,7 @@ exports.stdout = function (t) {
       t.equal(stack.length, oldsize + 1, "a message was printed");
       t.ok(didPrint(lvl.toUpperCase()), "msg contains correct log type");
       if (ns) {
-        t.ok(didPrint(ns), "msg contains namespace");
+        t.ok(didPrint(ns), "msg contains namespace " + ns);
       }
       if (lvl !== 'zalgo') {
         t.ok(didPrint(expected), "msg contains input message");
@@ -72,6 +72,15 @@ exports.stdout = function (t) {
     // verify unsuppress (of suppressed ones)
     var worky = noworky.sub('WO').muteOnly('warn');
     verifyOutput(worky, canSpeak && lvl !== 'warn', lvl, 'WO', false);
+
+    // inheritance check - (but go through an intermediate sub to not modify l)
+    // mute inheritance
+    var muted = l.sub().mute('error').sub('BS');
+    verifyOutput(muted, canSpeak && lvl !== 'error', lvl, 'BS', false);
+
+    // unmute inheritance
+    var unmuted = muted.unmute('error').sub('QQ');
+    verifyOutput(unmuted, canSpeak, lvl, 'QQ', false);
   });
   t.done();
 };
