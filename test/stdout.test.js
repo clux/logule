@@ -3,6 +3,9 @@ var l = require('../').init(module)
   , suppressed = ['trace', 'debug'] // will never speak
   , stack = [];
 
+// cfg enforces DD-MM-YYYY hh:mm:ss.xxx
+var expectedDateFormat = /\d{2}\-\d{2}\-\d{4} \d{2}\:\d{2}\:\d{2}\.\d{3}/;
+
 // hook into stdout to see what's being sent to it
 process.stdout.write = (function(write) {
   return function(buf, encoding, fd) {
@@ -13,6 +16,11 @@ process.stdout.write = (function(write) {
 
 var didPrint = function (str) {
   return stack[stack.length-1].indexOf(str) >= 0;
+};
+
+// if didPrint returns true, we can check regexps on it
+var lastMatches = function (reg) {
+  return reg.test(stack[stack.length-1]);
 };
 
 exports.stdout = function (t) {
@@ -48,6 +56,7 @@ exports.stdout = function (t) {
       if (lvl !== 'zalgo') {
         t.ok(didPrint(expected), "msg contains input message");
         t.ok(didPrint("extra"), "msg contains extra param (not %s'd)");
+        t.ok(lastMatches(expectedDateFormat), "correct date format");
       }
     }
     count += 1;

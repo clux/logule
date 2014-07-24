@@ -2,6 +2,14 @@
   "emitter"  : {
     "enabled"   : true
   },
+  "stdout": {
+    "timestamp": {
+      "delimiter": "-",
+      "date": true,
+      "reverse": true,
+      "precise": true
+    }
+  },
   "filestream": {
     "file"      : "./testdump.txt",
     "mutable"   : true,
