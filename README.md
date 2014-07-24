@@ -1,11 +1,16 @@
-# Logule [![Build Status](https://secure.travis-ci.org/clux/logule.png)](http://travis-ci.org/clux/logule) [![Dependency Status](https://david-dm.org/clux/logule.png)](https://david-dm.org/clux/logule)
+# Logule
+[![npm status](http://img.shields.io/npm/v/logule.svg)](https://www.npmjs.org/package/logule)
+[![build status](https://secure.travis-ci.org/clux/logule.svg)](http://travis-ci.org/clux/logule)
+[![dependency status](https://david-dm.org/clux/logule.svg)](https://david-dm.org/clux/logule)
+[![coverage status](http://img.shields.io/coveralls/clux/logule.svg)](https://coveralls.io/r/clux/logule)
+[![stable](http://img.shields.io/badge/stability-stable-74C614.svg)](http://nodejs.org/api/documentation.html#documentation_stability_index)
 
 Logule is a pretty, but heavily configurable logging utility for nodejs. It allows multiple transports (stdout + JSON filestream + emitted logs) as well as being configurable per user, per app and per module via localized config files.
 
 ![simple output!](https://github.com/clux/logule/raw/master/imgs/outputsimple.png)
 
 ## Key Design Goal
-Logging is a simple yet deceptively hairy problem. You don't want foreign modules to spam your app with needless messages, but you also don't want them to not say anything if you are passing bad stuff to them either. You want logs to look pretty, but you also want everyone else's logs to look like yours, and if that's not possible, you want to turn their logs off.
+Logging is a simple yet deceptively hairy problem. You don't want foreign modules to spam your app with needless messages, but you also want them to say something if you are passing down invalid arguments. You want logs to look pretty, but you also want a consistent style.
 
 What you really want, is not simply configurability, but a *hierarchy of configurability and suppression*. You want to be able to:
 

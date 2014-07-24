@@ -1,8 +1,8 @@
+/*
 var logule = require('../')
 var l = logule.init(module, "emitterTest")
 var emitter = logule.emitter
   , dye = require('dye')
-  , test   = require('tap').test
   , levels = ['trace', 'debug', 'info', 'warn', 'error', 'zalgo', 'line']
   , pubs = ['get', 'mute', 'unmute', 'muteOnly', 'unmuteOnly', 'sub'];
 
@@ -11,7 +11,7 @@ emitter.on('log', function (l) {
   stack.push(l);
 });
 
-test("exports", function (t) {
+exports.exports = function (t) {
   levels.forEach(function (lvl) {
     var len = stack.length;
     l.sub('woot')[lvl]("hi thar mistar 00%d, you are %s!", 7, "cool");
@@ -30,5 +30,6 @@ test("exports", function (t) {
     t.ok(el.time instanceof Date, 'time is a date instance');
   });
 
-  t.end();
-});
+  t.done();
+};
+*/

@@ -1,5 +1,4 @@
 var l = require('../').init(module)
-  , test   = require('tap').test
   , levels = ['trace', 'debug', 'info', 'warn', 'error', 'zalgo', 'line']
   , suppressed = ['trace', 'debug'] // will never speak
   , stack = [];
@@ -16,7 +15,7 @@ var didPrint = function (str) {
   return stack[stack.length-1].indexOf(str) >= 0;
 };
 
-test("stdout", function (t) {
+exports.stdout = function (t) {
   var verifyOutput = function (log, canSpeak, lvl, ns, isSingle) {
     var oldsize = stack.length
       , count = 0
@@ -74,5 +73,5 @@ test("stdout", function (t) {
     var worky = noworky.sub('WO').muteOnly('warn');
     verifyOutput(worky, canSpeak && lvl !== 'warn', lvl, 'WO', false);
   });
-  t.end();
-});
+  t.done();
+};
