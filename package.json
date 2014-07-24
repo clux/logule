@@ -19,9 +19,9 @@
   ],
   "main": "index.js",
   "scripts": {
-    "test": "cd test && nodeunit --reporter=verbose *.js && cd ..",
+    "test": "./test.sh verbose",
     "instrument": "jscoverage lib",
-    "coverage": "cd test && LOGULE_COV=1 nodeunit --reporter=lcov *.js && cd ..",
+    "coverage": "LOGULE_COV=1 ./test.sh lcov",
     "coveralls": "npm run coverage | coveralls"
   },
   "dependencies": {
