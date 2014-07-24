@@ -31,7 +31,7 @@ exports.stdout = function (t) {
       if (canSpeak) {
         t.ok(log.removed.indexOf(lvl) < 0, lvl + " can speak and is not removed");
       }
-      else if (suppressed.indexOf(lvl) < 0){
+      else if (suppressed.indexOf(lvl) < 0 && levels.indexOf(lvl) >= 0) {
         t.ok(log.removed.indexOf(lvl) >= 0, lvl + " can not speak and is removed");
       }
     }
@@ -82,5 +82,10 @@ exports.stdout = function (t) {
     var unmuted = muted.unmute('error').sub('QQ');
     verifyOutput(unmuted, canSpeak, lvl, 'QQ', false);
   });
+
+  // verify we can't get single with invalid level
+  var noop = l.sub('nope').get('gibberish');
+  verifyOutput(noop, false, 'gibberish', 'nope', true);
+
   t.done();
 };
