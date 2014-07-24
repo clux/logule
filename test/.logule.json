@@ -1,5 +1,11 @@
 {
   "emitter"  : {
     "enabled"   : true
+  },
+  "filestream": {
+    "file"      : "./testdump.txt",
+    "mutable"   : true,
+    "timestamp" : "toJSON",
+    "suppress"  : []
   }
 }
