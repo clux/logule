@@ -1,3 +1,7 @@
+2.0.1 / 2014-07-24
+==================
+  * Documentation and coverage release
+
 2.0.0 / 2012-11-14
 ==================
   * config rewritten nicely in JSON and must have the `.json` extension
