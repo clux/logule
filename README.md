@@ -210,7 +210,7 @@ log.unmuteOnly(); // unmuteOnly nothing === mute everything
 ```
 
 ## Configuration
-Configuration of colors, style, date formatting, transports, setting mutability and global suppression levels are done via via config files. The [default configuration file](https://github.com/clux/logule/blob/master/.logule.json) results in output looking like the images herein.
+Configuration of colors, style, date formatting, transports, setting mutability and global suppression levels are done via config files. The [default configuration file](https://github.com/clux/logule/blob/master/.logule.json) results in output looking like the images herein.
 
 Configs are located via the [confortable](https://github.com/clux/confortable) module. This module performs priority based config searches. In particular, it is used here with the following path priorities:
 
