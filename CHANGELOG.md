@@ -1,3 +1,11 @@
+2.1.0 / 2015-08-24
+==================
+  * Unfreeze `Logger.prototype` for #24 style user tweaks
+
+2.0.1 / 2014-07-24
+==================
+  * Documentation and coverage release
+
 2.0.1 / 2014-07-24
 ==================
   * Documentation and coverage release
