@@ -5,7 +5,7 @@
 [![coverage status](http://img.shields.io/coveralls/clux/logule.svg)](https://coveralls.io/r/clux/logule)
 [![stable](http://img.shields.io/badge/stability-stable-74C614.svg)](http://nodejs.org/api/documentation.html#documentation_stability_index)
 
-Logule is a pretty, but heavily configurable logging utility for nodejs. It allows multiple transports (stdout + JSON filestream + emitted logs) as well as being configurable per user, per app and per module via localized config files.
+Logule is a pretty, but heavily configurable logging utility for nodejs. It allows multiple transports as well as being configurable per user, per app and per module via localized config files.
 
 ![simple output!](https://github.com/clux/logule/raw/master/imgs/outputsimple.png)
 
@@ -27,7 +27,7 @@ as well as being able to configure *how* your:
 
 Manipulating these settings should be super easy, as it's most useful during development and debug sessions where time is of the essence.
 
-Finally, you should be able to get trace/debug messages from a module that's not behaving correctly, without spamming the shit out of people not using logule!
+Finally, you should be able to get trace/debug messages from a module that's not behaving correctly, without spamming people not using logule!
 
 Logule strives to adhere these goals and beyond that has since 1.0  maintained a stable API. Features so far has been greatly improved via issues/pull requests contributions, so please follow this path if there is anything you feel deserves attention.
 
@@ -428,10 +428,12 @@ l.info('works');
 This preserves muting of `b.js`, but opens up for its descendants.
 
 ## Colors
-The ASNI color code wrapping and zalgolizer is provided by [dye](https://github.com/clux/dye), wheras it used to rely on `colors`. Dye does not introduce implicit global dependencies on `String.prototype`, and provides more sensible zalgolizations.
+The ASNI color code wrapping and zalgolizer is provided by [dye](https://github.com/clux/dye), which does not introduce implicit global dependencies on `String.prototype`.
 
 ## npm Usage
-When logging with `logule >=2` inside an npm published library/executable, the practice is to put `logule` inside `package.json` `peerDependencies` and NOT the normal `dependencies`. This ensures all modules use the same code and thus logule can encapsulate everything needed to process ALL the logs an application uses. Logule's API is stable, so simply restricting to `"logule": "~2"` will suffice.
+Logging is a
+Published libraries that log should not depend on a logging library directly
+When logging with `logule >=2`, the practice is to put `logule` inside `package.json` `peerDependencies` and NOT the normal `dependencies`. This ensures all modules use the same code and thus logule can encapsulate everything needed to process ALL the logs an application uses. Logule's API is stable, so simply restricting to `"logule": "~2"` will suffice.
 
 In `"logule": "~1"`, bundling of separate copies per npm module was the standard and so logule then adopted the method of communicating with other copies via `process.logule` to compensate for not having any one central piece of code where all logs went through. Ultimately, decisions were being made on behalf of the config so this worked well.
 
