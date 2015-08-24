@@ -2,7 +2,7 @@
   "author": "Eirik Albrigtsen <analsandblaster@gmail.com>",
   "name": "logule",
   "description": "A multi-transport, peer-dependent logging library",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "stability": "stable",
   "repository": {
     "type": "git",
